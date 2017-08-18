@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Eindspel</title>
+  {% load staticfiles %}
+  <link rel="stylesheet" href="{% static 'eindspel/css/eindspel.css' %}"media="screen" title="no title"  charset="utf-8">
+</head>
+
+<body>
+  <div class = 'container'>
+    <div class = 'loginbackground'>
+    <h1>Generate New Piece</h1>
+      <form action = "/generator" method="post">
+        {% csrf_token %}
+        <div class = 'genform'>
+            <p>Name:</p>
+            <label>
+              <input type="text" name='piecename'/>
+            </label>
+            <p>Identifier Number:</p>
+            <label>
+              <input type="text" name='identifier'/>
+            </label>
+            <p>Health:</p>
+            <label>
+              <input type="text" name='health'/>
+            </label>
+            <p>Attack:</p>
+            <label>
+              <input type="text" name='attack'/>
+            </label>
+            <p>Defense:</p>
+            <label>
+              <input type="text" name='defense'/>
+            </label>
+        </div>
+        <div class = 'genform'>
+            <p>Attack Range:</p>
+            <label>
+              <input type="text" name='atkRange'/>
+            </label>
+            <p>Movement:</p>
+            <label>
+              <input type="text" name='movement'/>
+            </label>
+            <p>Abilities:</p>
+            <label>
+              <input type="text" name='abilities'/>
+            </label>
+            <p>Placement Range:</p>
+            <label>
+              <input type="text" name='placement'/>
+            </label>
+            <p>Deck Value:</p>
+            <label>
+              <input type="text" name='deckVal'/>
+            </label>
+        </div>
+        <div class = 'genform'>
+            <p>Graphic Front HTML:</p>
+            <label>
+              <input type="text" name='graphic'/>
+            </label>
+            <p>Graphic Back HTML:</p>
+            <label>
+              <input type="text" name='graphicr'/>
+            </label>
+
+            <input type="submit" value="Submit">
+        </div>
+      </form>
+
+      {% if messages %}
+          {% for message in messages %}
+            {% if 'register' in message.tags %}
+              <p class="error">{{message}}</p>
+            {% endif %}
+          {% endfor %}
+    {% endif %}
+
+
+    <a href="/gotoDeckManager">Return</a>
+
+
+    <form action = "/access" method="post">
+      {% csrf_token %}
+
+      <div class = 'genform'>
+          <p>Add Piece to Collection:</p>
+          <label>
+            <input type="text" name='addition'/>
+          </label>
+
+          <input type="submit" value="Submit">
+      </div>
+    </form>
+
+    {% if messages %}
+        {% for message in messages %}
+          {% if 'access' in message.tags %}
+            <p class="error">{{message}}</p>
+          {% endif %}
+        {% endfor %}
+  {% endif %}
+
+  </div>
+</div>
+</body>
+</html>

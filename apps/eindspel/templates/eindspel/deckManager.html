@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Eindspel</title>
+  {% load staticfiles %}
+  <link rel="stylesheet" href="{% static 'eindspel/css/eindspel.css' %}"media="screen" title="no title"  charset="utf-8">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script>
+      $(document).ready(function(){
+
+      });
+
+
+      var holdingData = false;
+      var holdId;
+      var holdVal;
+      var holdGraphic;
+      var pendingTotal = 0;
+
+      $(document).on('click', '.displaytile', function(){
+        if (holdingData == true){
+          this.innerHTML = ("<h6>" + holdId + "</h6> <h7>" + holdVal + "</h7><img src =" + holdGraphic + ">");
+          holdingData = false;
+          if (this.parentElement.className == 'row'){
+            pendingTotal += parseInt(holdVal);
+            document.getElementsByClassName('total')[0].innerHTML = (pendingTotal + "/60")
+          }
+          else if (this.parentElement.className == 'pieces'){
+            pendingTotal -= parseInt(holdVal);
+            document.getElementsByClassName('total')[0].innerHTML = (pendingTotal + "/60")
+          }
+        }
+        else{
+          //this rather absurd staement checks that the space in the div is neither empty (0) NOR is is a return space (17)
+          if(this.innerHTML.length != 17 && this.innerHTML.length != 0){
+            holdId = this.getElementsByTagName('h6')[0].innerHTML;
+            //console.log(holdId);
+            holdVal = this.getElementsByTagName('h7')[0].innerHTML;
+            //console.log(holdVal);
+            holdGraphic = this.getElementsByTagName('img')[0].src;
+            //console.log(holdGraphic);
+            holdingData = true;
+            //console.log(holdingData);
+            $(this).html('');
+          }
+        }
+
+      });
+
+      function assemble(){
+        console.log('deckChart');
+        var deckChart = document.getElementsByClassName('deckchart')[0];
+        //console.log(deckChart);
+        var taglist = deckChart.getElementsByTagName('h6');
+        //console.log(taglist);
+        var deckValueList = deckChart.getElementsByTagName('h7');
+        //console.log(deckValueTotal);
+
+        var deckIdList = [];
+        var deckValueTotal = 0;
+
+        for (var i=0; i<taglist.length; i++){
+          deckIdList.push(parseInt(taglist[i].innerHTML));
+        }
+        for (var k=0; k<deckValueList.length; k++){
+          deckValueTotal += parseInt(deckValueList[k].innerHTML);
+        }
+
+        console.log(deckIdList);
+        console.log(deckValueTotal);
+        if (deckValueTotal <= 60){
+          document.getElementById('deckPieces').value = deckIdList
+          document.getElementById('valueTotal').value = deckValueTotal
+          var confirmName = window.prompt("Name Deck");
+          if (confirmName != null) {
+              console.log(confirmName)
+              document.getElementById('deckName').value = confirmName
+              document.forms["deckBuilder"].submit();
+          }
+        }
+        else{
+          window.alert("The total value of pieces in a deck cannot exceed 60")
+        }
+      }
+
+      function start1(){
+        var selectDeck = window.prompt("Choose Your Deck");
+        document.getElementById('toFieldOne').value = selectDeck
+        document.forms["start1"].submit();
+      }
+
+  </script>
+</head>
+
+<body>
+  <div class = 'container'>
+    <div class = 'managebackground'>
+      <div class = 'decks'>
+          <h2>Decks</h2><!--Here, display decks owned by the user.-->
+          <ul>
+          {% for deck in decks %}
+            <li>{{ deck.deckName }}</li>
+          {% endfor %}
+
+          </ul>
+      </div>
+
+      <div class = 'newdeck'>
+          <h2>Assemble New Deck</h2><!--Here, use the piece moving jquery mechanics to allow users to place pieces from collection into decks.-->
+
+          <form id = "deckBuilder" action = "/deckBuilder" method = "post">
+            {% csrf_token %}
+
+            <label>
+              <h3>Deck Point Total: </h3> <div class = 'total'>/60</div>
+            </label>
+            <label>
+              <input type="hidden" id = 'deckName' name='deckName'/>
+            </label>
+            <label>
+              <input type="hidden" id = 'deckPieces' name='pieces'/>
+            </label>
+            <label>
+              <input type="hidden" id = 'valueTotal' name='points'/>
+            </label>
+            <div class = 'deckchart'>
+              <div class = 'row'>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+              </div>
+              <div class = 'row'>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+              </div>
+              <div class = 'row'>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+              </div>
+              <div class = 'row4'>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+                <div class = "displaytile">
+                </div>
+              </div>
+              <div class = 'submit'>
+              <button type = "button" onClick="return assemble()">Enter</button>
+              </div>
+            </div>
+
+          </form>
+
+          {% if messages %}
+              {% for message in messages %}
+                {% if 'deckReg' in message.tags %}
+                  <p class="error">{{message}}</p>
+                {% endif %}
+              {% endfor %}
+        {% endif %}
+      </div>
+
+      <div class = 'pieces'><!--Here, display all pieces in the user's collection.-->
+          <h2>Collection</h2>
+          {% for pieceObj in userCollection %}
+            <div class = "displaytile">
+              <h6>{{pieceObj.identifier}}</h6>
+              <h7>{{pieceObj.deckVal}}</h7>
+              <img src = "{{pieceObj.graphic}}">
+            </div>
+          {% endfor %}
+
+
+          {% if userCurrent.userName == 'Akural' %}
+            <a href="/genesis">Generate New Pieces</a>
+          {% endif %}
+
+          </div>
+      </div>
+    <div class = 'fieldselect'>
+      <form id = "start1" action = "/start1" method="post">
+        {% csrf_token %}
+        <img src="static/eindspel/images/Chessboard Garden 10.jpg" onClick = "start1()">
+      <label>
+        <input id = "toFieldOne" type="hidden" name='deckSelect'>
+      </label>
+    </form>
+    {% if messages %}
+        {% for message in messages %}
+          {% if 'decks' in message.tags %}
+            <p class="error">{{message}}</p>
+          {% endif %}
+        {% endfor %}
+  {% endif %}
+    <a href="/logout">Log Out</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

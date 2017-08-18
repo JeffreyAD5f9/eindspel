@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang = "en">
+<head>
+  <meta charset="UTF-8">
+  {% load staticfiles %}
+  <link rel="stylesheet" href="{% static 'eindspel/css/eindspel.css' %}"media="screen" title="no title"  charset="utf-8">
+  <title>Eindspel</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script> $(document).ready(function(){
+        $('.Show').hide();
+
+
+        var holdingPiece = false;
+        var phase = "Deploy Master";
+        var operationPts = 25;
+        var tutorialMessage = '';
+        var logSpace = 0;
+        var logMove = 0;
+        var striking = false;
+        var pieceUsed = '';
+
+        document.getElementById('phaseIndicator').innerHTML = "Phase: " + phase;
+        document.getElementById('operationIndicator').innerHTML = operationPts;
+
+        $(document).on('click', 'img', function select(){
+          if(phase == "Deploy Master"){
+            console.log(phase);
+            if((this.parentElement.getElementsByClassName('infoAbil')[0].value[0]) == 1){
+              tutorialMessage = '';
+              document.getElementById('tutorialDisp').innerHTML = tutorialMessage;
+
+              holdingPiece = true;
+              var pieceSelected = $(this).parent();
+              var imageHTML = $(this.parentElement.innerHTML);
+              console.log(this.parentElement.getElementsByClassName('infoName')[0].value);
+              setSpaces = this.parentElement.getElementsByClassName('infoPlace')[0].value;
+              opSetCost = parseInt(this.parentElement.getElementsByClassName('infoVal')[0].value);
+
+              counter = 0;
+              spaceUnit = '';
+              setSpaceArray = [];
+              for (i=0; i<setSpaces.length; i++){
+                if(counter < 4){
+                  spaceUnit = spaceUnit + setSpaces[i];
+                  counter ++;
+                }
+                else if (counter < 5){
+                  setSpaceArray.push(spaceUnit);
+                  spaceUnit = '';
+                  counter ++;
+                  continue;
+                }
+                else{
+                  counter = 0;
+                }
+              }
+              setSpaceArray.push(spaceUnit);
+              for (i=0; i<setSpaceArray.length; i++){
+                if ($(setSpaceArray[i]).find('img').length){
+                }
+                else{
+                  $(setSpaceArray[i]).html("<div class = 'Show'></div>");
+                }
+              }
+
+              if (holdingPiece == true){
+                $("img").css("pointer-events", "none");
+                $(".tile img").css("opacity", ".4");
+                $(".select").mouseenter(function(){
+                  $(this).css("opacity", ".4");
+                });
+                $(".select").mouseleave(function(){
+                  $(this).css("opacity", "1");
+                });
+              }
+
+              $('.Show').click(function(){
+                $("img").css("pointer-events", "auto");
+                $(".tile, img").css("opacity", "1");
+                operationPts -= opSetCost;
+                document.getElementById('operationIndicator').innerHTML = operationPts;
+                $(".piecesAvailable").css("opacity", "1");
+                $(".piecesAvailable").css("opacity", "1");
+                holdingPiece = false;
+                $(".select").mouseenter(function(){
+                  $(this).css("opacity", "1");
+                });
+                $(".select").mouseleave(function(){
+                  $(this).css("opacity", "1");
+                });
+
+                var spaceSelected = $(this).parent();
+                $(spaceSelected).html(imageHTML);
+                if(spaceSelected[0] != pieceSelected[0]){
+                  pieceSelected[0].getElementsByClassName('infoSpace')[0].value = '#' + spaceSelected.attr('id')
+                  spaceSelected[0].getElementsByClassName('infoSpace')[0].value = '#' + spaceSelected.attr('id')
+                  $(pieceSelected).html('');//////////////empties the tile the piece was selected from
+                  $(pieceSelected).css("border", "none");
+                }
+                $('.Show').hide();
+                phase = "Deploy";
+                document.getElementById('phaseIndicator').innerHTML = "Phase: " + phase;
+                });
+              }
+              else{
+                tutorialMessage = "First, select a Master piece and deploy it to the field."
+                document.getElementById('tutorialDisp').innerHTML = "<p>" + tutorialMessage + "</p>";
+              }
+            }////////////////End 'Deploy Master' Phase////////////////////////
+
+
+            ////////////////////////Begin Deploy Phase/////////////////////////
+
+
+        else if(phase == "Deploy"){
+              opSetCost = parseInt(this.parentElement.getElementsByClassName('infoVal')[0].value);
+
+
+                holdingPiece = true;
+                var pieceSelected = $(this).parent();
+                var imageHTML = $(this.parentElement.innerHTML);
+                if (pieceSelected[0].className == "select"){/////////If piece is in menu
+
+                  if(opSetCost <= operationPts){///////////If you have enough points to set the piece
+                    tutorialMessage = '';
+                    document.getElementById('tutorialDisp').innerHTML = tutorialMessage;
+                    console.log(this.parentElement.getElementsByClassName('infoName')[0].value);
+                    setSpaces = this.parentElement.getElementsByClassName('infoPlace')[0].value;
+                    counter = 0;
+                    spaceUnit = '';
+                    setSpaceArray = [];
+                    for (i=0; i<setSpaces.length; i++){
+                      if(counter < 4){
+                        spaceUnit = spaceUnit + setSpaces[i];
+                        counter ++;
+                      }
+                      else if (counter < 5){
+                        setSpaceArray.push(spaceUnit);
+                        spaceUnit = '';
+                        counter ++;
+                        continue;
+                      }
+                      else{
+                        counter = 0;
+                      }
+                    }
+                    setSpaceArray.push(spaceUnit);
+                    for (i=0; i<setSpaceArray.length; i++){
+                      if ($(setSpaceArray[i]).find('img').length){
+                      }
+                      else{
+                        $(setSpaceArray[i]).html("<div class = 'Show'></div>");
+                      }
+                    }
+                  }
+                  else{
+                    holdingPiece = false;
+                    $("img").css("pointer-events", "auto");
+                    tutorialMessage = "Not enough Operations Points left to set this piece. If you have points left, you can move pieces on the field, or you can press the Ready button to move on to the next phase."
+                    document.getElementById('tutorialDisp').innerHTML = "<p>" + tutorialMessage + "</p>";
+                  }
+                }
+                else {//////////////////If piece is placed on field -- Ready to move////////////////
+                  if(operationPts > 0){
+                    tutorialMessage = '';
+                    document.getElementById('tutorialDisp').innerHTML = tutorialMessage;
+                    var onSpace = this.parentElement.getElementsByClassName('infoSpace')[0].value
+                    var spString = '';
+                    for (i=0; i<onSpace.length; i++){
+                      if(i>1){
+                        spString = spString +onSpace[i];
+                      }
+                    }
+                    console.log(parseInt(spString));
+                    spaceInt = parseInt(spString);
+                    var logSpace = spaceInt;
+                    stepByStepCalc = spaceInt;
+                    moveInt = parseInt(this.parentElement.getElementsByClassName('infoMove')[0].value);
+                    logMove = moveInt;
+                    moveSpaces = [];
+                    var cardinal = [];
+                    ////////////////Calculate Forward Movement
+                    for (i=0; i<moveInt; i++){;
+                      if((stepByStepCalc-8) >= 1){
+                        moveSpaces.push(stepByStepCalc - 8);
+                        cardinal.push(1);
+                        stepByStepCalc -= 8
+                      }
+                    }
+                    ///////////////Calculate Backward Movement
+                    stepByStepCalc = spaceInt;
+                    for (i=0; i<moveInt; i++){
+                      if((stepByStepCalc+8) <= 64){
+                        moveSpaces.push(stepByStepCalc + 8);
+                        cardinal.push(2);
+                        stepByStepCalc += 8
+                      }
+                    }
+                    /////////////////Calculate Right Movement
+                    stepByStepCalc = spaceInt;
+                    for (i=0; i<moveInt; i++){
+                      if((stepByStepCalc/8 % 1) != 0){
+                        moveSpaces.push(stepByStepCalc + 1);
+                        cardinal.push(3);
+                        stepByStepCalc += 1
+                      }
+                    }
+                    //////////////Calculate Left Movement
+                    stepByStepCalc = spaceInt;
+                    for (i=0; i<moveInt; i++){
+                      if(((stepByStepCalc-1)/8 % 1) != 0){
+                        moveSpaces.push(stepByStepCalc - 1);
+                        cardinal.push(4);
+                        stepByStepCalc -= 1
+                      }
+                    }
+                    var spaceStr = ''
+                    for(i=0; i<moveSpaces.length; i++){
+                      if(moveSpaces[i]<10){
+                        spaceStr = spaceStr + '#T0' + (moveSpaces[i].toString()) + ', '
+                      }
+                      else{
+                        spaceStr = spaceStr + '#T' + (moveSpaces[i].toString()) + ', '
+                      }
+                    }
+                    console.log(spaceStr);
+                    setSpaces = spaceStr;
+
+                    /////////////////Compile array of spaces to be visible/////////////////
+                    counter = 0;
+                    spaceUnit = '';
+                    setSpaceArray = [];
+                    for (i=0; i<setSpaces.length; i++){
+                      if(counter < 4){
+                        spaceUnit = spaceUnit + setSpaces[i];
+                        counter ++;
+                      }
+                      else if (counter < 5){
+                        setSpaceArray.push(spaceUnit);
+                        spaceUnit = '';
+                        counter ++;
+                        continue;
+                      }
+                      else{
+                        counter = 0;
+                      }
+                    }
+                    /////////////////Compile array of spaces to be visible/////////////////
+                    var blocked = false;
+                    var mark = 0;
+                    for (i=0; i<setSpaceArray.length; i++){
+                      if(blocked == false){
+                        if ($(setSpaceArray[i]).find('img').length){
+                          mark = cardinal[i];
+                          blocked = true;
+                        }
+                        else{
+                          $(setSpaceArray[i]).html("<div class = 'Show'></div>");
+                        }
+                      }
+                      else{////////blocked == true
+                        if(cardinal[i] == mark){
+                        }
+                        else{
+                          if ($(setSpaceArray[i]).find('img').length){
+                            blocked = true;
+                            mark = cardinal[i];
+                          }
+                          else{
+                            $(setSpaceArray[i]).html("<div class = 'Show'></div>");
+                            blocked = false;
+                            mark = 0;
+                          }
+                        }
+                      }
+
+                    }
+                  }
+                  /////////////////Compile array complete
+                  else{
+                    holdingPiece = false;
+                    $("img").css("pointer-events", "auto");
+                    tutorialMessage = "No Operations points remaining. You can move on to the next phase by clicking the Ready button."
+                    document.getElementById('tutorialDisp').innerHTML = "<p>" + tutorialMessage + "</p>";
+                    $(".piecesAvailable").css("opacity", "1");
+                  }/////////////////////End else for Not enough points
+                }////////////////End Else for moving pieces///////////////////////
+
+
+                if (holdingPiece == true){
+                  $("img").css("pointer-events", "none");
+                  $(".tile img").css("opacity", ".4");
+                  $(".select").mouseenter(function(){
+                    $(this).css("opacity", ".4");
+                  });
+                  $(".select").mouseleave(function(){
+                    $(this).css("opacity", "1");
+                  });
+                }
+
+
+                $('.Show').click(function(){
+                  $("img").css("pointer-events", "auto");
+                  $(".tile, img").css("opacity", "1");
+                  if (pieceSelected[0].className != "select"){
+                    var spacesMoved = 0;
+                    var onSpace = this.parentElement.id
+                    var spString = '';
+                    for (i=0; i<onSpace.length; i++){
+                      if(i>0){
+                        spString = spString + onSpace[i];
+                      }
+                    }
+                    //////////////////calculate the number of spaces moved on the board
+                    var difference = logSpace - (parseInt(spString));
+                    if(difference < 0){
+                      difference *= -1;
+                    }
+                    if(difference > logMove){
+                      difference = difference/8;
+                    }
+                  console.log(difference);
+                  opSetCost = difference;
+                }////////////////end if piece is being moved (rather than set)//////////////////////
+                  operationPts -= opSetCost;
+                  document.getElementById('operationIndicator').innerHTML = operationPts;
+                  $(".piecesAvailable").css("opacity", "1");
+                  holdingPiece = false;
+                  $(".select").mouseenter(function(){
+                    $(this).css("opacity", "1");
+                  });
+                  $(".select").mouseleave(function(){
+                    $(this).css("opacity", "1");
+                  });
+
+                  var spaceSelected = $(this).parent();
+                  $(spaceSelected).html(imageHTML);
+                  if(spaceSelected[0] != pieceSelected[0]){
+                    pieceSelected[0].getElementsByClassName('infoSpace')[0].value = '#' + spaceSelected.attr('id')
+                    spaceSelected[0].getElementsByClassName('infoSpace')[0].value = '#' + spaceSelected.attr('id')
+                    $(pieceSelected).html('');/////////empties the tile the piece was selected from
+                    $(pieceSelected).css("border", "none");
+                  }
+                  $('.Show').hide();
+                });/////////////////End 'Show' div click function////////////////
+
+          }///////////////End 'Deploy' Phase///////////////////////
+
+
+
+          //////////////////////////Begin Strike Phase/////////////////////
+
+
+
+          else if(phase == "Strike"){
+            if(this.parentElement.getElementsByClassName('activeStatus')[0].value == 'active'){//check if piece was used
+              if(striking == false &&  this.parentElement.getElementsByClassName('infoId')[0].value[0] != 'e'){
+                //////////////If piece isn't already selected////////////////
+                if(operationPts > 0){
+                  tutorialMessage = '';
+                  document.getElementById('tutorialDisp').innerHTML = tutorialMessage;//Blank tutorial message
+                  var onSpace = this.parentElement.getElementsByClassName('infoSpace')[0].value
+                  var spString = '';
+                  for (i=0; i<onSpace.length; i++){
+                    if(i>1){
+                      spString = spString +onSpace[i];
+                    }
+                  }
+                  console.log(parseInt(spString));
+                  spaceInt = parseInt(spString);
+                  var logSpace = spaceInt;
+                  stepByStepCalc = spaceInt;
+                  rangeInt = parseInt(this.parentElement.getElementsByClassName('infoRange')[0].value);
+                  strikeSpaces = [];
+                  //////////Calculate Forward Range
+                  for (i=0; i<rangeInt; i++){;
+                    if((stepByStepCalc-8) >= 1){
+                      strikeSpaces.push(stepByStepCalc - 8);
+                      stepByStepCalc -= 8
+                    }
+                  }
+                  var spaceStr = ''///////////Begin compiling valid list of strikable spaces
+                  for(i=0; i<strikeSpaces.length; i++){
+                    if(strikeSpaces[i]<10){
+                      spaceStr = spaceStr + '#T0' + (strikeSpaces[i].toString()) + ', '
+                    }
+                    else{
+                      spaceStr = spaceStr + '#T' + (strikeSpaces[i].toString()) + ', '
+                    }
+                  }
+                  console.log(spaceStr);
+                  setSpaces = spaceStr;
+
+                  /////////Compile array of spaces to be visible/////////////
+                  counter = 0;
+                  spaceUnit = '';
+                  setSpaceArray = [];
+                  for (i=0; i<setSpaces.length; i++){
+                    if(counter < 4){
+                      spaceUnit = spaceUnit + setSpaces[i];
+                      counter ++;
+                    }
+                    else if (counter < 5){
+                      setSpaceArray.push(spaceUnit);
+                      spaceUnit = '';
+                      counter ++;
+                      continue;
+                    }
+                    else{
+                      counter = 0;
+                    }
+                  }
+                  setSpaceArray.push(spaceUnit);
+                  /////////Compile array of spaces to be visible/////////////
+
+                  $("img").css("pointer-events", "none");///////////Make non-target pieces unable to be clicked
+                  $(".tile img").css("opacity", ".4");/////////Make non-target pieces fade
+                  for (i=0; i<setSpaceArray.length; i++){//////////For each space in the array of strikable spaces.....
+                    if ($(setSpaceArray[i]).find('img').length){////////////if image is detected....
+
+                      var target = $(setSpaceArray[i]).find('img')[0];///////////Find target image
+                      $(this).css("opacity", "1");///////////Make selected piece fully visible
+                      pieceUsed = this;
+                      $(target).css("opacity", "1");//////////////Make target pieces fully visible
+                      $(target).css("pointer-events", "auto");/////////Make target pieces available for event
+                      striking = true;
+                    }
+                    else{
+                      $(setSpaceArray[i]).html("<div class = 'Show'></div>");//////////Show strikable spaces
+                    }
+                  }
+                }
+                ///////////Compile array complete
+                else{
+                  holdingPiece = false;
+                  $("img").css("pointer-events", "auto");
+                  tutorialMessage = "No Operations points remaining. You can move on to the next phase by clicking the Ready button."
+                  document.getElementById('tutorialDisp').innerHTML = "<p>" + tutorialMessage + "</p>";
+                  $(".piecesAvailable").css("opacity", "1");
+                }////////////End else for Not enough points
+              }///////////end if striking == false;
+
+              else if (striking == false && this.parentElement.getElementsByClassName('infoId')[0].value[0] == 'e'){
+                console.log('enemy');
+              }
+
+              else{/////////////Striking == true
+                ////////////////////////////Attack Actions/////////////////////////////////////
+                operationPts -= 1;
+                document.getElementById('operationIndicator').innerHTML = operationPts;
+                $(".piecesAvailable").css("opacity", "1");
+                striking = false;
+                $("img").css("pointer-events", "auto");///////////////Make non-target pieces able to be clicked again
+                $(".tile img").css("opacity", "1");////////////Make all pieces visible
+                var atk = pieceUsed.parentElement.getElementsByClassName('infoAtk')[0].value;
+                this.parentElement.getElementsByClassName('infoHealth')[0].value -= atk;
+                console.log(this.parentElement.getElementsByClassName('infoHealth')[0].value);
+                pieceUsed.parentElement.getElementsByClassName('activeStatus')[0].value = 'inactive';
+                ////////Flash Animation Basic//////////////
+                $(this).css("opacity", ".4");
+                $(this).parent().append("<h5 id = 'damage'>" + atk + "</h5>");
+                var flashing = this;
+                var flash = setInterval(function(){
+                  $(flashing).css("opacity", "1");
+                  $("#damage").css("opacity", "0");
+                  clearInterval(flash);
+                }, 150);
+                var dmgFlash = setInterval(function(){
+                  $("#damage").remove();
+                  $(".piecesAvailable").css("opacity", "0");
+                  console.log(flashing.parentElement.getElementsByClassName('infoHealth')[0].value);
+                  if(flashing.parentElement.getElementsByClassName('infoHealth')[0].value <= 0){
+                    $(flashing).css("opacity", "0");
+                  }
+                  clearInterval(dmgFlash);
+                }, 900);
+                if(flashing.parentElement.getElementsByClassName('infoHealth')[0].value <= 0){
+                  var endFlash = setInterval(function(){
+                    flashing.parentElement.innerHTML = '';
+                    clearInterval(endFlash);
+                  }, 1800);
+                }
+
+
+                ////////Flash Animation Basic//////////////
+
+                $('.Show').hide();
+              }
+
+              $('.Show').click(function(){
+                striking = false;
+                $("img").css("pointer-events", "auto");/////////////Make non-target pieces able to be clicked again
+                $(".tile img").css("opacity", "1");/////////////Make all pieces visible
+                $(".piecesAvailable").css("opacity", "0");
+                $('.Show').hide();
+              });
+            }////////////////End if piece is active
+            else{
+              console.log("piece is inactive");
+            }
+
+          }////////////////////End Strike phase//////////////////
+
+
+        });//////////////////End Document Click Img function/////////////////////////
+
+        $('#phase').click(function(){
+          tutorialMessage = '';
+          document.getElementById('tutorialDisp').innerHTML = tutorialMessage;
+          if (phase == "Strike"){
+            phase = "Enemy";
+            document.getElementById('phaseIndicator').innerHTML = "Phase: " + phase;
+
+            ///Animation////
+            flare();
+            ///Animation///
+
+            var initiate = setInterval(function(){
+              phase = "Calculating"
+              document.getElementById('phaseIndicator').innerHTML = "Phase: " + phase;
+              clearInterval(initiate);
+            }, 1000);
+            ////////////Shift Phase back to user control/////////////////
+            var shiftBack = setInterval(function(){
+              phase = "Deploy"
+              document.getElementById('phaseIndicator').innerHTML = "Phase: " + phase;
+              operationPts = 25;
+              document.getElementById('operationIndicator').innerHTML = operationPts;
+              clearInterval(shiftBack);
+            }, 2000);
+            ////////////Shift Phase back to user control/////////////////
+            console.log(document.getElementsByClassName('activeStatus'));
+            reactivate = document.getElementsByClassName('activeStatus');///////////reactivate all used pieces/////////
+            for(i=0; i<reactivate.length; i++){
+              reactivate[i].value = "active";
+            }
+          }
+          if (phase == "Deploy"){//////Switching from Deploy to Strike/////////////
+            phase = "Strike";
+            document.getElementById('phaseIndicator').innerHTML = "Phase: " + phase;
+          }
+
+
+        });
+
+        $('#options').click(function(){
+          console.log('phase');
+        });
+
+        ////////////////Fade in pieces Available menu///////////////
+        $(".piecesAvailable").mouseenter(function(){
+          $(this).css("opacity", "1");
+        });
+        $(".piecesAvailable").mouseleave(function(){
+          $(this).css("opacity", "0");
+        });
+        ////////////////////Cancel Function//////////////////////
+        document.onkeydown = function(a){
+          if(a.keyCode == 65){
+            console.log('cancel');
+            $('.Show').hide();
+            holdingPiece = false;
+            $("img").css("pointer-events", "auto");
+            $(".tile, img").css("opacity", "1");
+          }
+        }
+        ////////////////////Cancel Function//////////////////////
+      });/////////////End document ready function
+
+
+      ////////////////Callable Functions////////////////////
+      function slash(){
+        document.getElementsByClassName('enemy')[0].src = "static/eindspel/images/Archdemon R5.png"
+        var slash = setInterval(function(){
+          document.getElementsByClassName('enemy')[0].src = "static/eindspel/images/Archdemon R3.png"
+          clearInterval(slash);
+        }, 150);
+        var slash2 = setInterval(function(){
+          document.getElementsByClassName('enemy')[0].src = "static/eindspel/images/Archdemon R2.png"
+          clearInterval(slash2);
+        }, 250);
+        var slash3 = setInterval(function(){
+          document.getElementsByClassName('enemy')[0].src = "static/eindspel/images/Archdemon R1.png"
+          clearInterval(slash3);
+        }, 450);
+      }
+
+      function flare(){
+        var flare1 = setInterval(function(){
+          document.getElementsByClassName('enemy')[0].src = "static/eindspel/images/Archdemon R4.png"
+          clearInterval(flare1);
+        }, 150);
+        var flare2 = setInterval(function(){
+          document.getElementsByClassName('enemy')[0].src = "static/eindspel/images/Archdemon R6.png"
+          clearInterval(flare2);
+        }, 750);
+        var flare3 = setInterval(function(){
+          document.getElementsByClassName('enemy')[0].src = "static/eindspel/images/Archdemon R1.png"
+          clearInterval(flare3);
+        }, 950);
+      }
+      ////////////////////Cancel Function//////////////////////
+  </script>
+</head>
+
+<body>
+  <div class = "container">
+    <div class = "background">
+      <h3 id = 'phaseIndicator'>Phase:</h3>
+
+      <div id = "T01" class = "tile">
+      </div>
+      <div id = "T02" class = "tile">
+      </div>
+      <div id = "T03" class = "tile">
+      </div>
+      <div id = "T04" class = "tile">
+      </div>
+      <div id = "T05" class = "tile">
+      </div>
+      <div id = "T06" class = "tile">
+      </div>
+      <div id = "T07" class = "tile">
+      </div>
+      <div id = "T08" class = "tile">
+      </div>
+
+      <div id = "T09" class = "tile">
+      </div>
+      <div id = "T10" class = "tile">
+      </div>
+      <div id = "T11" class = "tile">
+      </div>
+      <div id = "T12" class = "tile">
+      </div>
+      <div id = "T13" class = "tile">
+        <img id = "imgAlter" class = "enemy" src= "static/eindspel/images/Archdemon R1.png">
+        <input autocomplete="off" type="hidden" class = 'infoName' name = 'infoName' value='Archdemon'/>
+        <input autocomplete="off" type="hidden" class = 'infoId' name = 'infoId' value='e1'/>
+        <input autocomplete="off" type="hidden" class = 'infoHealth' name = 'infoHealth' value='700'/>
+        <input autocomplete="off" type="hidden" class = 'infoAtk' name = 'infoAtk' value='50'/>
+        <input autocomplete="off" type="hidden" class = 'infoDef' name = 'infoDef' value='20'/>
+        <input autocomplete="off" type="hidden" class = 'infoRange' name = 'infoRange' value='4'/>
+        <input autocomplete="off" type="hidden" class = 'infoMove' name = 'infoMove' value='3'/>
+        <input autocomplete="off" type="hidden" class = 'infoAbil' name = 'infoAbil' value='200000000'/>
+        <input autocomplete="off" type="hidden" class = 'activeStatus' name = 'activeStatus' value='active'/>
+      </div>
+      <div id = "T14" class = "tile">
+      </div>
+      <div id = "T15" class = "tile">
+      </div>
+      <div id = "T16" class = "tile">
+      </div>
+
+      <div id = "T17" class = "tile">
+      </div>
+      <div id = "T18" class = "tile">
+      </div>
+      <div id = "T19" class = "tile">
+      </div>
+      <div id = "T20" class = "tile">
+      </div>
+      <div id = "T21" class = "tile">
+      </div>
+      <div id = "T22" class = "tile">
+      </div>
+      <div id = "T23" class = "tile">
+      </div>
+      <div id = "T24" class = "tile">
+      </div>
+
+      <div id = "T25" class = "tile">
+      </div>
+      <div id = "T26" class = "tile">
+      </div>
+      <div id = "T27" class = "tile">
+      </div>
+      <div id = "T28" class = "tile">
+      </div>
+      <div id = "T29" class = "tile">
+      </div>
+      <div id = "T30" class = "tile">
+      </div>
+      <div id = "T31" class = "tile">
+      </div>
+      <div id = "T32" class = "tile">
+      </div>
+
+      <div id = "T33" class = "tile">
+      </div>
+      <div id = "T34" class = "tile">
+      </div>
+      <div id = "T35" class = "tile">
+      </div>
+      <div id = "T36" class = "tile">
+      </div>
+      <div id = "T37" class = "tile">
+      </div>
+      <div id = "T38" class = "tile">
+      </div>
+      <div id = "T39" class = "tile">
+      </div>
+      <div id = "T40" class = "tile">
+      </div>
+
+      <div id = "T41" class = "tile">
+      </div>
+      <div id = "T42" class = "tile">
+      </div>
+      <div id = "T43" class = "tile">
+      </div>
+      <div id = "T44" class = "tile">
+      </div>
+      <div id = "T45" class = "tile">
+      </div>
+      <div id = "T46" class = "tile">
+      </div>
+      <div id = "T47" class = "tile">
+      </div>
+      <div id = "T48" class = "tile">
+      </div>
+
+      <div id = "T49" class = "tile">
+      </div>
+      <div id = "T50" class = "tile">
+      </div>
+      <div id = "T51" class = "tile">
+      </div>
+      <div id = "T52" class = "tile">
+      </div>
+      <div id = "T53" class = "tile">
+      </div>
+      <div id = "T54" class = "tile">
+      </div>
+      <div id = "T55" class = "tile">
+      </div>
+      <div id = "T56" class = "tile">
+      </div>
+
+      <div id = "T57" class = "tile">
+      </div>
+      <div id = "T58" class = "tile">
+      </div>
+      <div id = "T59" class = "tile">
+      </div>
+      <div id = "T60" class = "tile">
+      </div>
+      <div id = "T61" class = "tile">
+      </div>
+      <div id = "T62" class = "tile">
+      </div>
+      <div id = "T63" class = "tile">
+      </div>
+      <div id = "T64" class = "tile">
+      </div>
+
+    </div>
+    <div class='piecesAvailable'>
+      {% for piece in activeDeck %}
+        <div class='select'>
+          <img src = "{{piece.graphic}}">
+            <input type="hidden" class = 'infoName' name = 'infoName' value='{{piece.pieceName}}'/>
+            <input type="hidden" class = 'infoId' name = 'infoId' value='{{piece.identifier}}'/>
+            <input type="hidden" class = 'infoHealth' name = 'infoHealth' value='{{piece.health}}'/>
+            <input type="hidden" class = 'infoAtk' name = 'infoAtk' value='{{piece.attack}}'/>
+            <input type="hidden" class = 'infoDef' name = 'infoDef' value='{{piece.defense}}'/>
+            <input type="hidden" class = 'infoRange' name = 'infoRange' value='{{piece.atkRange}}'/>
+            <input type="hidden" class = 'infoMove' name = 'infoMove' value='{{piece.movement}}'/>
+            <input type="hidden" class = 'infoAbil' name = 'infoAbil' value='{{piece.abilities}}'/>
+            <input type="hidden" class = 'infoPlace' name = 'infoPlace' value='{{piece.placement}}'/>
+            <input type="hidden" class = 'infoVal' name = 'infoVal' value='{{piece.deckVal}}'/>
+            <input type="hidden" class = 'infoSpace' name = 'infoSpace' value=''/>
+            <input type="hidden" class = 'infoGraph' name = 'infoGraph' value='{{piece.graphic}}'/>
+            <input type="hidden" class = 'infoGraphR' name = 'infoGraphR' value='{{piece.graphicR}}'/>
+            <input type="hidden" class = 'activeStatus' name = 'activeStatus' value='active'/>
+        </div>
+      {% endfor %}
+      <div class = "menu">
+        <button id = "phase" type="button">Ready</button>
+        <button id = "options" type="button">Options</button>
+      </div>
+      <div class = "hud">
+        <h3 id = 'operationHud'>Operation Points:</h3>
+        <h3 id = 'operationIndicator'>Operation Points:</h3>
+      </div>
+      <div id = "tutorialDisp"></div>
+    </div>
+  </div>
+</body>
+
+</html>
