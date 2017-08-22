@@ -456,6 +456,7 @@
                 this.parentElement.getElementsByClassName('infoHealth')[0].value -= atk;
                 console.log(this.parentElement.getElementsByClassName('infoHealth')[0].value);
                 pieceUsed.parentElement.getElementsByClassName('activeStatus')[0].value = 'inactive';
+
                 ////////Flash Animation Basic//////////////
                 $(this).css("opacity", ".4");
                 $(this).parent().append("<h5 id = 'damage'>" + atk + "</h5>");
@@ -480,7 +481,6 @@
                     clearInterval(endFlash);
                   }, 1800);
                 }
-
 
                 ////////Flash Animation Basic//////////////
 
@@ -511,29 +511,37 @@
             phase = "Enemy";
             document.getElementById('phaseIndicator').innerHTML = "Phase: " + phase;
 
-            ///Animation////
-            flare();
-            ///Animation///
 
-            var initiate = setInterval(function(){
-              phase = "Calculating"
-              document.getElementById('phaseIndicator').innerHTML = "Phase: " + phase;
-              clearInterval(initiate);
-            }, 1000);
-            ////////////Shift Phase back to user control/////////////////
-            var shiftBack = setInterval(function(){
-              phase = "Deploy"
-              document.getElementById('phaseIndicator').innerHTML = "Phase: " + phase;
-              operationPts = 25;
-              document.getElementById('operationIndicator').innerHTML = operationPts;
-              clearInterval(shiftBack);
-            }, 2000);
-            ////////////Shift Phase back to user control/////////////////
-            console.log(document.getElementsByClassName('activeStatus'));
-            reactivate = document.getElementsByClassName('activeStatus');///////////reactivate all used pieces/////////
-            for(i=0; i<reactivate.length; i++){
-              reactivate[i].value = "active";
+            ///Animation////
+            slash();
+            ///Animation///
+            enemiesOnField = document.getElementsByClassName('enemy');
+            for(e=0; e<enemiesOnField.length; e++){
+              var searchResult = searchFor('infoAbil', '100000000'); //Search for Master type pieces
+              console.log(searchResult);
+              var targetOptions = checkTargetOptions(searchResult, enemiesOnField[e]);
+              console.log(targetOptions);
             }
+
+
+          //  var initiate = setInterval(function(){
+          //    phase = "Calculating"
+          //    document.getElementById('phaseIndicator').innerHTML = "Phase: " + phase;
+          //    clearInterval(initiate);
+          //  }, 1000);
+            ////////////Shift Phase back to user control/////////////////
+          //  var shiftBack = setInterval(function(){
+          //    phase = "Deploy"
+          //    document.getElementById('phaseIndicator').innerHTML = "Phase: " + phase;
+          //    operationPts = 25;
+          //    document.getElementById('operationIndicator').innerHTML = operationPts;
+          //    clearInterval(shiftBack);
+          //  }, 2000);
+            ////////////Shift Phase back to user control/////////////////
+          //  reactivate = document.getElementsByClassName('activeStatus');///////////reactivate all used pieces/////////
+          //  for(i=0; i<reactivate.length; i++){
+          //    reactivate[i].value = "active";
+          //  }
           }
           if (phase == "Deploy"){//////Switching from Deploy to Strike/////////////
             phase = "Strike";
@@ -568,7 +576,7 @@
       });/////////////End document ready function
 
 
-      ////////////////Callable Functions////////////////////
+      ////////////////Animation Functions////////////////////
       function slash(){
         document.getElementsByClassName('enemy')[0].src = "static/eindspel/images/Archdemon R5.png"
         var slash = setInterval(function(){
@@ -599,7 +607,200 @@
           clearInterval(flare3);
         }, 950);
       }
-      ////////////////////Cancel Function//////////////////////
+      ////////////////////AI Functions//////////////////////
+
+      function searchFor(attribute, value){//////////////////Search for Piece
+        var search = document.getElementsByClassName(attribute);
+        var collect = [];
+        for (i=0; i<search.length; i++){
+          if(search[i].value == value){
+            collect.push(search[i].parentElement)
+          }
+        }
+        return collect;
+      }
+
+      function checkMove(movementValue, currentSpace){////////////Check Moveable Spaces
+          var onSpace = currentSpace;
+          var spString = '';
+          for (i=0; i<onSpace.length; i++){
+            if(i>0){//////////Space is passed in in a slightly different format this time, so it starts at 0 instead of 1
+              spString = spString +onSpace[i];
+            }
+          }
+          spaceInt = parseInt(spString);
+          var logSpace = spaceInt;
+          stepByStepCalc = spaceInt;
+          moveInt = movementValue;
+          logMove = moveInt;
+          moveSpaces = [];
+          var cardinal = [];
+          ////////////////Calculate Forward Movement
+          for (i=0; i<moveInt; i++){;
+            if((stepByStepCalc-8) >= 1){
+              moveSpaces.push(stepByStepCalc - 8);
+              cardinal.push(1);
+              stepByStepCalc -= 8
+            }
+          }
+          ///////////////Calculate Backward Movement
+          stepByStepCalc = spaceInt;
+          for (i=0; i<moveInt; i++){
+            if((stepByStepCalc+8) <= 64){
+              moveSpaces.push(stepByStepCalc + 8);
+              cardinal.push(2);
+              stepByStepCalc += 8
+            }
+          }
+          /////////////////Calculate Right Movement
+          stepByStepCalc = spaceInt;
+          for (i=0; i<moveInt; i++){
+            if((stepByStepCalc/8 % 1) != 0){
+              moveSpaces.push(stepByStepCalc + 1);
+              cardinal.push(3);
+              stepByStepCalc += 1
+            }
+          }
+          //////////////Calculate Left Movement
+          stepByStepCalc = spaceInt;
+          for (i=0; i<moveInt; i++){
+            if(((stepByStepCalc-1)/8 % 1) != 0){
+              moveSpaces.push(stepByStepCalc - 1);
+              cardinal.push(4);
+              stepByStepCalc -= 1
+            }
+          }
+          var spaceStr = ''
+          for(i=0; i<moveSpaces.length; i++){
+            if(moveSpaces[i]<10){
+              spaceStr = spaceStr + '#T0' + (moveSpaces[i].toString()) + ', '
+            }
+            else{
+              spaceStr = spaceStr + '#T' + (moveSpaces[i].toString()) + ', '
+            }
+          }
+          setSpaces = spaceStr;
+
+          /////////////////Compile array of spaces to be visible/////////////////
+          counter = 0;
+          spaceUnit = '';
+          setSpaceArray = [];
+          for (i=0; i<setSpaces.length; i++){
+            if(counter < 4){
+              spaceUnit = spaceUnit + setSpaces[i];
+              counter ++;
+            }
+            else if (counter < 5){
+              setSpaceArray.push(spaceUnit);
+              spaceUnit = '';
+              counter ++;
+              continue;
+            }
+            else{
+              counter = 0;
+            }
+          }
+          /////////////////Compile array of spaces to be visible/////////////////
+          var blocked = false;
+          var mark = 0;
+          for (i=0; i<setSpaceArray.length; i++){
+            if(blocked == false){
+              if ($(setSpaceArray[i]).find('img').length){
+                mark = cardinal[i];
+                blocked = true;
+              }
+              else{
+                $(setSpaceArray[i]).html("<div class = 'Show'></div>");
+              }
+            }
+            else{////////blocked == true
+              if(cardinal[i] == mark){
+              }
+              else{
+                if ($(setSpaceArray[i]).find('img').length){
+                  blocked = true;
+                  mark = cardinal[i];
+                }
+                else{
+                  $(setSpaceArray[i]).html("<div class = 'Show'></div>");
+                  blocked = false;
+                  mark = 0;
+                }
+              }
+            }/////////blocked == true end
+          }
+          var updatedSpaces = [];
+          for(i=0; i<setSpaceArray.length; i++){
+            var reformat = '';
+            if(moveSpaces[i] < 10){
+              reformat = 'T0' + String(moveSpaces[i]);
+            }
+            else{
+              reformat = 'T' + String(moveSpaces[i]);
+            }
+            if(document.getElementById(reformat).getElementsByClassName("Show")[0]){
+              updatedSpaces.push(moveSpaces[i]);
+            }
+          }
+          return [setSpaceArray, updatedSpaces];
+        }/////////End CheckMove Function
+
+        function checkTargetOptions(searchResult, enemyi){
+          var enemy = enemyi;
+          var enemyOnSpace = enemy.parentElement.id;
+          var enemyMovementValue = enemy.parentElement.getElementsByClassName('infoMove')[0].value;
+          var targetArray = [];/////Contains the numbers of target spaces
+          for(i=0; i<searchResult.length; i++){//////////Compile targetArray
+            var targetSpace = '';////The space the enemy wants to reach to hit each piece
+            var targetOnSpace = searchResult[i].id;
+            for (k=0; k<targetOnSpace.length; k++){
+              if(k>0){
+                targetSpace = targetSpace + targetOnSpace[k];
+              }
+            }
+            targetInt = parseInt(targetSpace);
+            targetArray.push(targetInt - 8);/////Priority space
+            targetArray.push(targetInt - 7);/////secondary spaces
+            targetArray.push(targetInt - 9);
+          }
+          var moveResult = checkMove(enemyMovementValue, enemyOnSpace);//Check spaces the enemy can move to
+          var enemySpaceArray = moveResult[0];////////moveable Spaces in #id format for moving
+          var enemyArrayInt = moveResult[1];///////spaces in number format for comparison
+          var prioritySpace = 0;/////Priority space
+          var secondarySpace = 0;/////secondary spaces
+          var alignSpace = 0;/////If piece cannot be reached find a space that is in line with it
+          var approachSpace = 0;/////If piece cannot be reached find a space that is closer to it
+          for(i=0; i<enemyArrayInt.length; i++){
+            if(enemyArrayInt[i] > approachSpace){
+              approachSpace = enemyArrayInt[i];
+            }
+            if (enemyArrayInt[i] == targetArray[0]){
+              prioritySpace = 1;
+            }
+            if (enemyArrayInt[i] == targetArray[1]){
+              secondarySpace = 1;
+            }
+            if (enemyArrayInt[i] == targetArray[2]){
+              secondarySpace = 1;
+            }
+            if (enemyArrayInt[i] == targetArray[0] - 40){
+              alignSpace = enemyArrayInt[i];
+            }
+            if (enemyArrayInt[i] == targetArray[0] - 32){
+              alignSpace = enemyArrayInt[i];
+            }
+            if (enemyArrayInt[i] == targetArray[0] - 24){
+              alignSpace = enemyArrayInt[i];
+            }
+            if (enemyArrayInt[i] == targetArray[0] - 16){
+              alignSpace = enemyArrayInt[i];
+            }
+            if (enemyArrayInt[i] == targetArray[0] - 8){
+              alignSpace = enemyArrayInt[i];
+            }
+          }
+          return [prioritySpace, secondarySpace, alignSpace, approachSpace];
+        }
   </script>
 </head>
 
