@@ -519,9 +519,27 @@
             for(e=0; e<enemiesOnField.length; e++){
               var searchResult = searchFor('infoAbil', '100000000'); //Search for Master type pieces
               console.log(searchResult);
-              var targetOptions = checkTargetOptions(searchResult, enemiesOnField[e]);
-              console.log(targetOptions);
-            }
+              var masterList = [];
+              for(x=0; x<searchResult.length; x++){//////Get targeting data on master pieces
+                masterList.push(checkTargetOptions(searchResult[x], enemiesOnField[e]));
+              }
+              console.log(masterList);
+
+              var targetsOnField = [];
+              var all = document.getElementsByClassName('infoPlace');/////Find all of the user's pieces
+              for(i=0; i<all.length; i++){
+                if(all[i].parentElement.id){/////////Parse out pieces on field
+                  targetsOnField.push(all[i].parentElement.id);
+                }
+              }
+              for(i=0; i<targetsOnField.length; i++){
+                console.log(targetsOnField[i]);
+                console.log('sides');
+                console.log(checkSides(targetsOnField[i]));
+                console.log('surround');
+                console.log(checkSurround(targetsOnField[i]));
+              }
+            }////////End for all enemies on Field
 
 
           //  var initiate = setInterval(function(){
@@ -613,7 +631,7 @@
         var search = document.getElementsByClassName(attribute);
         var collect = [];
         for (i=0; i<search.length; i++){
-          if(search[i].value == value){
+          if(search[i].value == value && search[i].parentElement.id){
             collect.push(search[i].parentElement)
           }
         }
@@ -749,20 +767,19 @@
           var enemy = enemyi;
           var enemyOnSpace = enemy.parentElement.id;
           var enemyMovementValue = enemy.parentElement.getElementsByClassName('infoMove')[0].value;
+          var targetHP = searchResult.getElementsByClassName('infoHealth')[0].value;
           var targetArray = [];/////Contains the numbers of target spaces
-          for(i=0; i<searchResult.length; i++){//////////Compile targetArray
-            var targetSpace = '';////The space the enemy wants to reach to hit each piece
-            var targetOnSpace = searchResult[i].id;
-            for (k=0; k<targetOnSpace.length; k++){
-              if(k>0){
-                targetSpace = targetSpace + targetOnSpace[k];
-              }
+          var targetSpace = '';////The space the enemy wants to reach to hit each piece
+          var targetOnSpace = searchResult.id;
+          for (k=0; k<targetOnSpace.length; k++){
+            if(k>0){
+              targetSpace = targetSpace + targetOnSpace[k];
             }
-            targetInt = parseInt(targetSpace);
-            targetArray.push(targetInt - 8);/////Priority space
-            targetArray.push(targetInt - 7);/////secondary spaces
-            targetArray.push(targetInt - 9);
           }
+          targetInt = parseInt(targetSpace);
+          targetArray.push(targetInt - 8);/////Priority space
+          targetArray.push(targetInt - 7);/////secondary spaces
+          targetArray.push(targetInt - 9);
           var moveResult = checkMove(enemyMovementValue, enemyOnSpace);//Check spaces the enemy can move to
           var enemySpaceArray = moveResult[0];////////moveable Spaces in #id format for moving
           var enemyArrayInt = moveResult[1];///////spaces in number format for comparison
@@ -799,7 +816,65 @@
               alignSpace = enemyArrayInt[i];
             }
           }
-          return [prioritySpace, secondarySpace, alignSpace, approachSpace];
+          return [prioritySpace, secondarySpace, alignSpace, approachSpace, targetHP];
+        }
+
+        function checkSides(spaceInput){
+          var sides = [];
+          var spaceIntCS = parseInt(spaceInput[1] + spaceInput[2]);
+          if((spaceIntCS/8 % 1) != 0){
+            if(spaceIntCS < 10){
+              sides.push("T0" + String(spaceIntCS+1));
+            }
+            else{
+              sides.push("T" + String(spaceIntCS+1));
+            }
+          }
+          if(((spaceIntCS-1)/8 % 1) != 0){
+            if(spaceIntCS < 10){
+              sides.push("T0" + String(spaceIntCS-1));
+            }
+            else{
+              sides.push("T" + String(spaceIntCS-1));
+            }
+          }
+          return sides;
+        }
+        function checkSurround(spaceInput){
+          var surroundings = [];
+          var frontAndBack = [];
+          var sides = checkSides(spaceInput);
+          for(y=0; y<sides.length; y++){
+            surroundings.push(sides[y]);
+          }
+          var spaceIntCS = parseInt(spaceInput[1] + spaceInput[2]);
+          if((spaceIntCS-8) >= 1){//Front
+            if(spaceIntCS < 10){
+              frontAndBack.push("T0" + String(spaceIntCS-8));
+              surroundings.push("T0" + String(spaceIntCS-8));
+            }
+            else{
+              frontAndBack.push("T" + String(spaceIntCS-8));
+              surroundings.push("T" + String(spaceIntCS-8));
+            }
+          }
+          if((spaceIntCS+8) <= 64){//Back
+            if(spaceIntCS < 10){
+              frontAndBack.push("T0" + String(spaceIntCS+8));
+              surroundings.push("T0" + String(spaceIntCS+8));
+            }
+            else{
+              frontAndBack.push("T" + String(spaceIntCS+8));
+              surroundings.push("T" + String(spaceIntCS+8));
+            }
+          }
+          for(x=0; x<frontAndBack.length; x++){
+            var diagonals = checkSides(frontAndBack[x]);
+            for(y=0; y<diagonals.length; y++){
+              surroundings.push(diagonals[y]);
+            }
+          }
+          return surroundings;
         }
   </script>
 </head>
@@ -928,6 +1003,21 @@
       <div id = "T51" class = "tile">
       </div>
       <div id = "T52" class = "tile">
+        <img src="static/eindspel/images/Master.png">
+            <input class="infoName" name="infoName" value="BetaMaster" type="hidden">
+            <input class="infoId" name="infoId" value="5" type="hidden">
+            <input class="infoHealth" name="infoHealth" value="250" type="hidden">
+            <input class="infoAtk" name="infoAtk" value="20" type="hidden">
+            <input class="infoDef" name="infoDef" value="20" type="hidden">
+            <input class="infoRange" name="infoRange" value="1" type="hidden">
+            <input class="infoMove" name="infoMove" value="2" type="hidden">
+            <input class="infoAbil" name="infoAbil" value="100000000" type="hidden">
+            <input class="infoPlace" name="infoPlace" value="#T57, #T58, #T59, #T60, #T61, #T62, #T63, #T64" type="hidden">
+            <input class="infoVal" name="infoVal" value="2" type="hidden">
+            <input class="infoSpace" name="infoSpace" value="#T61" type="hidden">
+            <input class="infoGraph" name="infoGraph" value="static/eindspel/images/Master.png" type="hidden">
+            <input class="infoGraphR" name="infoGraphR" value="static/eindspel/images/Master.png" type="hidden">
+            <input class="activeStatus" name="activeStatus" value="active" type="hidden">
       </div>
       <div id = "T53" class = "tile">
       </div>
