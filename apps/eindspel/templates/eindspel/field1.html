@@ -517,13 +517,13 @@
             ///Animation///
             enemiesOnField = document.getElementsByClassName('enemy');
             for(e=0; e<enemiesOnField.length; e++){
-              var searchResult = searchFor('infoAbil', '100000000'); //Search for Master type pieces
-              console.log(searchResult);
-              var masterList = [];
-              for(x=0; x<searchResult.length; x++){//////Get targeting data on master pieces
-                masterList.push(checkTargetOptions(searchResult[x], enemiesOnField[e]));
-              }
-              console.log(masterList);
+              //var searchResult = searchFor('infoAbil', '100000000'); //Search for Master type pieces
+              //console.log(searchResult);
+              //var masterList = [];
+              //for(x=0; x<searchResult.length; x++){//////Get targeting data on master pieces
+              //  masterList.push(checkTargetOptions(searchResult[x], enemiesOnField[e]));
+              //}
+              //console.log(masterList);
 
               var targetsOnField = [];
               var all = document.getElementsByClassName('infoPlace');/////Find all of the user's pieces
@@ -532,12 +532,77 @@
                   targetsOnField.push(all[i].parentElement.id);
                 }
               }
-              for(i=0; i<targetsOnField.length; i++){
-                console.log(targetsOnField[i]);
-                console.log('sides');
-                console.log(checkSides(targetsOnField[i]));
-                console.log('surround');
-                console.log(checkSurround(targetsOnField[i]));
+              for(t=0; t<targetsOnField.length; t++){////////
+                console.log(targetsOnField[t]);
+
+                var master = 0;
+                var triCheck = 0;
+                var defModifier = 0;
+                var counterDamage = 0;
+                var counterDamage2 = 0;
+                var defSupport = 0;
+                var defSupport2 = 0;
+                var atkSupport = 0;
+                var spdSupport = 0;
+                var targetDiv = document.getElementById(targetsOnField[t]);
+                var ability = document.getElementById(targetsOnField[t]).lastElementChild.value;
+                var options = checkTargetOptions(targetDiv, enemiesOnField[e]);
+                console.log(options);
+                var sideSpaces = checkSides(targetsOnField[t]);
+                var surroundSpaces = checkSurround(targetsOnField[t]);
+                for(s=0; s<sideSpaces.length; s++){
+                  if(document.getElementById(sideSpaces[s]).lastElementChild.value){
+                    triCheck += 1;
+                    abilityPlus = document.getElementById(sideSpaces[s]).lastElementChild.value;
+                    if(ability[0] == '1'){
+                      master = 1;
+                    }
+                    if(ability[1] == '1'){
+                      defSupport = 1;
+                    }
+                    if(abilityPlus[1] == '1'){
+                      defModifier += 1;
+                    }
+                    if(ability[2] == '1'){
+                      counterDamage += 1;
+                    }
+                    if(abilityPlus[2] == '1'){
+                      counterDamage2 += 1;
+                    }
+                  }
+                }
+                for(s=0; s<surroundSpaces.length; s++){
+                  if(document.getElementById(surroundSpaces[s]).lastElementChild.value){
+                    abilityPlus = document.getElementById(surroundSpaces[s]).lastElementChild.value;
+                    if(ability[3] == '1'){
+                      defSupport2 = 1;
+                    }
+                    if(ability[4] == '1'){
+                      atkSupport = 1;
+                    }
+                    if(ability[5] == '1'){
+                      spdSupport = 1;
+                    }
+                  }
+                }
+                console.log('master');
+                console.log(master);
+                console.log('triCheck');
+                console.log(triCheck);
+                console.log('defModifier');
+                console.log(defModifier);
+                console.log('counterDamage');
+                console.log(counterDamage);
+                console.log('counterDamage2');
+                console.log(counterDamage2);
+                console.log('defSupport');
+                console.log(defSupport);
+                console.log('defSupport2');
+                console.log(defSupport2);
+                console.log('atkSupport');
+                console.log(atkSupport);
+                console.log('spdSupport');
+                console.log(spdSupport);
               }
             }////////End for all enemies on Field
 
@@ -768,6 +833,7 @@
           var enemyOnSpace = enemy.parentElement.id;
           var enemyMovementValue = enemy.parentElement.getElementsByClassName('infoMove')[0].value;
           var targetHP = searchResult.getElementsByClassName('infoHealth')[0].value;
+          var targetDef = searchResult.getElementsByClassName('infoDef')[0].value;
           var targetArray = [];/////Contains the numbers of target spaces
           var targetSpace = '';////The space the enemy wants to reach to hit each piece
           var targetOnSpace = searchResult.id;
@@ -816,7 +882,7 @@
               alignSpace = enemyArrayInt[i];
             }
           }
-          return [prioritySpace, secondarySpace, alignSpace, approachSpace, targetHP];
+          return [prioritySpace, secondarySpace, alignSpace, approachSpace, targetHP, targetDef];
         }
 
         function checkSides(spaceInput){
@@ -1003,21 +1069,6 @@
       <div id = "T51" class = "tile">
       </div>
       <div id = "T52" class = "tile">
-        <img src="static/eindspel/images/Master.png">
-            <input class="infoName" name="infoName" value="BetaMaster" type="hidden">
-            <input class="infoId" name="infoId" value="5" type="hidden">
-            <input class="infoHealth" name="infoHealth" value="250" type="hidden">
-            <input class="infoAtk" name="infoAtk" value="20" type="hidden">
-            <input class="infoDef" name="infoDef" value="20" type="hidden">
-            <input class="infoRange" name="infoRange" value="1" type="hidden">
-            <input class="infoMove" name="infoMove" value="2" type="hidden">
-            <input class="infoAbil" name="infoAbil" value="100000000" type="hidden">
-            <input class="infoPlace" name="infoPlace" value="#T57, #T58, #T59, #T60, #T61, #T62, #T63, #T64" type="hidden">
-            <input class="infoVal" name="infoVal" value="2" type="hidden">
-            <input class="infoSpace" name="infoSpace" value="#T61" type="hidden">
-            <input class="infoGraph" name="infoGraph" value="static/eindspel/images/Master.png" type="hidden">
-            <input class="infoGraphR" name="infoGraphR" value="static/eindspel/images/Master.png" type="hidden">
-            <input class="activeStatus" name="activeStatus" value="active" type="hidden">
       </div>
       <div id = "T53" class = "tile">
       </div>
@@ -1057,13 +1108,13 @@
             <input type="hidden" class = 'infoDef' name = 'infoDef' value='{{piece.defense}}'/>
             <input type="hidden" class = 'infoRange' name = 'infoRange' value='{{piece.atkRange}}'/>
             <input type="hidden" class = 'infoMove' name = 'infoMove' value='{{piece.movement}}'/>
-            <input type="hidden" class = 'infoAbil' name = 'infoAbil' value='{{piece.abilities}}'/>
             <input type="hidden" class = 'infoPlace' name = 'infoPlace' value='{{piece.placement}}'/>
             <input type="hidden" class = 'infoVal' name = 'infoVal' value='{{piece.deckVal}}'/>
             <input type="hidden" class = 'infoSpace' name = 'infoSpace' value=''/>
             <input type="hidden" class = 'infoGraph' name = 'infoGraph' value='{{piece.graphic}}'/>
             <input type="hidden" class = 'infoGraphR' name = 'infoGraphR' value='{{piece.graphicR}}'/>
             <input type="hidden" class = 'activeStatus' name = 'activeStatus' value='active'/>
+            <input type="hidden" class = 'infoAbil' name = 'infoAbil' value='{{piece.abilities}}'/>
         </div>
       {% endfor %}
       <div class = "menu">
