@@ -517,14 +517,6 @@
             ///Animation///
             enemiesOnField = document.getElementsByClassName('enemy');
             for(e=0; e<enemiesOnField.length; e++){
-              //var searchResult = searchFor('infoAbil', '100000000'); //Search for Master type pieces
-              //console.log(searchResult);
-              //var masterList = [];
-              //for(x=0; x<searchResult.length; x++){//////Get targeting data on master pieces
-              //  masterList.push(checkTargetOptions(searchResult[x], enemiesOnField[e]));
-              //}
-              //console.log(masterList);
-
               var targetsOnField = [];
               var all = document.getElementsByClassName('infoPlace');/////Find all of the user's pieces
               for(i=0; i<all.length; i++){
@@ -535,6 +527,7 @@
               for(t=0; t<targetsOnField.length; t++){////////
                 console.log(targetsOnField[t]);
 
+                var strikeData = [];
                 var master = 0;
                 var triCheck = 0;
                 var defModifier = 0;
@@ -547,62 +540,63 @@
                 var targetDiv = document.getElementById(targetsOnField[t]);
                 var ability = document.getElementById(targetsOnField[t]).lastElementChild.value;
                 var options = checkTargetOptions(targetDiv, enemiesOnField[e]);
-                console.log(options);
+                console.log(ability);
                 var sideSpaces = checkSides(targetsOnField[t]);
                 var surroundSpaces = checkSurround(targetsOnField[t]);
+                if(ability[0] == '1'){
+                  master = 1;
+                }
+                if(ability[1] == '1'){
+                  defSupport = 1;
+                }
+                if(ability[2] == '1'){
+                  counterDamage += 1;
+                }
+                if(ability[3] == '1'){
+                  defSupport2 = 1;
+                }
+                if(ability[4] == '1'){
+                  atkSupport = 1;
+                }
+                if(ability[5] == '1'){
+                  spdSupport = 1;
+                }
                 for(s=0; s<sideSpaces.length; s++){
-                  if(document.getElementById(sideSpaces[s]).lastElementChild.value){
-                    triCheck += 1;
-                    abilityPlus = document.getElementById(sideSpaces[s]).lastElementChild.value;
-                    if(ability[0] == '1'){
-                      master = 1;
-                    }
-                    if(ability[1] == '1'){
-                      defSupport = 1;
-                    }
-                    if(abilityPlus[1] == '1'){
-                      defModifier += 1;
-                    }
-                    if(ability[2] == '1'){
-                      counterDamage += 1;
-                    }
-                    if(abilityPlus[2] == '1'){
-                      counterDamage2 += 1;
+                  if(document.getElementById(surroundSpaces[s]).lastElementChild != null){
+                    if(document.getElementById(surroundSpaces[s]).lastElementChild.className != 'Show'){
+                      triCheck += 1;
+                      abilityPlus = document.getElementById(sideSpaces[s]).lastElementChild.value;
+                      if(abilityPlus[1] == '1'){
+                        defModifier += 1;
+                      }
+                      if(abilityPlus[2] == '1'){
+                        counterDamage2 += 1;
+                      }
                     }
                   }
                 }
                 for(s=0; s<surroundSpaces.length; s++){
-                  if(document.getElementById(surroundSpaces[s]).lastElementChild.value){
-                    abilityPlus = document.getElementById(surroundSpaces[s]).lastElementChild.value;
-                    if(ability[3] == '1'){
-                      defSupport2 = 1;
-                    }
-                    if(ability[4] == '1'){
-                      atkSupport = 1;
-                    }
-                    if(ability[5] == '1'){
-                      spdSupport = 1;
+                  if(document.getElementById(surroundSpaces[s]).lastElementChild != null){
+                    if(document.getElementById(surroundSpaces[s]).lastElementChild.className != 'Show'){
+                      abilityPlus = document.getElementById(surroundSpaces[s]).lastElementChild.value;
+                      if(abilityPlus[3] == '1'){
+                        defModifier += 1;
+                      }
                     }
                   }
                 }
-                console.log('master');
-                console.log(master);
-                console.log('triCheck');
-                console.log(triCheck);
-                console.log('defModifier');
-                console.log(defModifier);
-                console.log('counterDamage');
-                console.log(counterDamage);
-                console.log('counterDamage2');
-                console.log(counterDamage2);
-                console.log('defSupport');
-                console.log(defSupport);
-                console.log('defSupport2');
-                console.log(defSupport2);
-                console.log('atkSupport');
-                console.log(atkSupport);
-                console.log('spdSupport');
-                console.log(spdSupport);
+                strikeData.push(master);
+                strikeData.push(triCheck);
+                strikeData.push(defModifier);
+                strikeData.push(counterDamage);
+                strikeData.push(counterDamage2);
+                strikeData.push(defSupport);
+                strikeData.push(defSupport2);
+                strikeData.push(atkSupport);
+                strikeData.push(spdSupport);
+
+                console.log(strikeData);
+
               }
             }////////End for all enemies on Field
 
