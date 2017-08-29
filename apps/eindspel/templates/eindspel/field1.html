@@ -517,6 +517,7 @@
             ///Animation///
             enemiesOnField = document.getElementsByClassName('enemy');
             for(e=0; e<enemiesOnField.length; e++){
+              var enemyAtk = enemiesOnField[e].parentElement.getElementsByClassName('infoAtk')[0].value;
               var targetsOnField = [];
               var all = document.getElementsByClassName('infoPlace');/////Find all of the user's pieces
               for(i=0; i<all.length; i++){
@@ -525,77 +526,8 @@
                 }
               }
               for(t=0; t<targetsOnField.length; t++){////////
-                console.log(targetsOnField[t]);
-
-                var strikeData = [];
-                var master = 0;
-                var triCheck = 0;
-                var defModifier = 0;
-                var counterDamage = 0;
-                var counterDamage2 = 0;
-                var defSupport = 0;
-                var defSupport2 = 0;
-                var atkSupport = 0;
-                var spdSupport = 0;
-                var targetDiv = document.getElementById(targetsOnField[t]);
-                var ability = document.getElementById(targetsOnField[t]).lastElementChild.value;
-                var options = checkTargetOptions(targetDiv, enemiesOnField[e]);
-                console.log(ability);
-                var sideSpaces = checkSides(targetsOnField[t]);
-                var surroundSpaces = checkSurround(targetsOnField[t]);
-                if(ability[0] == '1'){
-                  master = 1;
-                }
-                if(ability[1] == '1'){
-                  defSupport = 1;
-                }
-                if(ability[2] == '1'){
-                  counterDamage += 1;
-                }
-                if(ability[3] == '1'){
-                  defSupport2 = 1;
-                }
-                if(ability[4] == '1'){
-                  atkSupport = 1;
-                }
-                if(ability[5] == '1'){
-                  spdSupport = 1;
-                }
-                for(s=0; s<sideSpaces.length; s++){
-                  if(document.getElementById(surroundSpaces[s]).lastElementChild != null){
-                    if(document.getElementById(surroundSpaces[s]).lastElementChild.className != 'Show'){
-                      triCheck += 1;
-                      abilityPlus = document.getElementById(sideSpaces[s]).lastElementChild.value;
-                      if(abilityPlus[1] == '1'){
-                        defModifier += 1;
-                      }
-                      if(abilityPlus[2] == '1'){
-                        counterDamage2 += 1;
-                      }
-                    }
-                  }
-                }
-                for(s=0; s<surroundSpaces.length; s++){
-                  if(document.getElementById(surroundSpaces[s]).lastElementChild != null){
-                    if(document.getElementById(surroundSpaces[s]).lastElementChild.className != 'Show'){
-                      abilityPlus = document.getElementById(surroundSpaces[s]).lastElementChild.value;
-                      if(abilityPlus[3] == '1'){
-                        defModifier += 1;
-                      }
-                    }
-                  }
-                }
-                strikeData.push(master);
-                strikeData.push(triCheck);
-                strikeData.push(defModifier);
-                strikeData.push(counterDamage);
-                strikeData.push(counterDamage2);
-                strikeData.push(defSupport);
-                strikeData.push(defSupport2);
-                strikeData.push(atkSupport);
-                strikeData.push(spdSupport);
-
-                console.log(strikeData);
+                var scoreData = scoreTarget(targetsOnField[t], enemyAtk);
+                console.log(scoreData); //////[finalScore, atktype]
 
               }
             }////////End for all enemies on Field
@@ -828,6 +760,7 @@
           var enemyMovementValue = enemy.parentElement.getElementsByClassName('infoMove')[0].value;
           var targetHP = searchResult.getElementsByClassName('infoHealth')[0].value;
           var targetDef = searchResult.getElementsByClassName('infoDef')[0].value;
+          var targetAtk = searchResult.getElementsByClassName('infoAtk')[0].value;
           var targetArray = [];/////Contains the numbers of target spaces
           var targetSpace = '';////The space the enemy wants to reach to hit each piece
           var targetOnSpace = searchResult.id;
@@ -876,7 +809,7 @@
               alignSpace = enemyArrayInt[i];
             }
           }
-          return [prioritySpace, secondarySpace, alignSpace, approachSpace, targetHP, targetDef];
+          return [prioritySpace, secondarySpace, alignSpace, approachSpace, targetHP, targetDef, targetAtk];
         }
 
         function checkSides(spaceInput){
@@ -935,6 +868,165 @@
             }
           }
           return surroundings;
+        }
+        function scoreTarget(targetScored, atkValue){
+          console.log(targetScored);
+
+          var strikeData = [];
+          var master = 0;
+          var triCheck = 0;
+          var defModifier = 0;
+          var counterDamage = 0;
+          var counterDamage2 = 0;
+          var defSupport = 0;
+          var defSupport2 = 0;
+          var atkSupport = 0;
+          var spdSupport = 0;
+          var masterOnSide = 0;
+          var masterOnSurround = 0;
+          var targetDiv = document.getElementById(targetScored);
+          var ability = document.getElementById(targetScored).lastElementChild.value;
+          var options = checkTargetOptions(targetDiv, enemiesOnField[e]);
+          var sideSpaces = checkSides(targetScored);
+          var surroundSpaces = checkSurround(targetScored);
+          if(ability[0] == '1'){
+            master = 1;
+          }
+          if(ability[1] == '1'){
+            defSupport = 1;
+          }
+          if(ability[2] == '1'){
+            counterDamage += 1;
+          }
+          if(ability[3] == '1'){
+            defSupport2 = 1;
+          }
+          if(ability[4] == '1'){
+            atkSupport = 1;
+          }
+          if(ability[5] == '1'){
+            spdSupport = 1;
+          }
+          for(s=0; s<sideSpaces.length; s++){
+            if(document.getElementById(surroundSpaces[s]).lastElementChild != null){
+              if(document.getElementById(surroundSpaces[s]).lastElementChild.className != 'Show'){
+                triCheck += 1;
+                abilityPlus = document.getElementById(sideSpaces[s]).lastElementChild.value;
+                if(abilityPlus[1] == '1'){
+                  defModifier += 1;
+                }
+                if(abilityPlus[2] == '1'){
+                  counterDamage2 += 1;
+                }
+                if(abilityPlus[0] == '1'){
+                  masterOnSide += 1;
+                }
+              }
+            }
+          }
+          for(s=0; s<surroundSpaces.length; s++){
+            if(document.getElementById(surroundSpaces[s]).lastElementChild != null){
+              if(document.getElementById(surroundSpaces[s]).lastElementChild.className != 'Show'){
+                abilityPlus = document.getElementById(surroundSpaces[s]).lastElementChild.value;
+                if(abilityPlus[3] == '1'){
+                  defModifier += 1;
+                }
+                if(abilityPlus[0] == '1'){
+                  masterOnSurround += 1;
+                }
+              }
+            }
+          }
+          strikeData.push(master);
+          strikeData.push(triCheck);
+          strikeData.push(defModifier);
+          strikeData.push(counterDamage);
+          strikeData.push(counterDamage2);
+          strikeData.push(defSupport);
+          strikeData.push(defSupport2);
+          strikeData.push(atkSupport);
+          strikeData.push(spdSupport);
+          strikeData.push(masterOnSide);
+          strikeData.push(masterOnSurround);
+
+          //console.log(strikeData);
+          var finalScore = 0;
+          var atktype = 0;
+          var masterKilldirect = 0;
+          var masterStrikeIndirect = 0;
+          var damageTotal = parseInt(atkValue) - parseInt(options[5]);
+
+          //////////////Scoring System//////////////
+          if(strikeData[0] == 1){/////////If target is Master
+            //console.log('Master');
+            if (parseInt(options[4]) - damageTotal <= 0){///////////If Kill on master
+              finalScore += 400;
+              masterKill = 1;
+            }
+            if(parseInt(options[4]) - damageTotal <= parseInt(atkValue)){////////////If Critical damage on Master
+              finalScore += 70;
+            }
+          }
+
+          if(strikeData[5] == 1){////////Target is Defense Support type one (sides only)
+            //console.log('DefenseSupport');
+            if(strikeData[9] == 1){//////If it supports the Master
+              finalScore += 60;
+            }
+          }
+
+          if(strikeData[6] == 1){////////Target is Defense Support type two (surroundings)
+            //console.log('DefenseSupport2');
+            if(strikeData[10] == 1){//////If it supports the Master
+              finalScore += 60;
+            }
+            else{
+              finalScore += 50;
+            }
+          }
+
+          if(strikeData[7] == 1){////////Target is Attack Support
+            //console.log('AttackSupport');
+            finalScore += 40;
+          }
+
+          if(strikeData[8] == 1){////////Target is Speed Support
+            //console.log('AttackSupport');
+            finalScore += 40;
+          }
+
+          if(strikeData[3] != 0){////////Target has counter damage factor
+            //console.log('Counter');
+            finalScore -= strikeData[3]*5;
+          }
+
+          if(strikeData[4] != 0){////////Target has counter damage support factor
+            //console.log('CounterSupport');
+            finalScore -= strikeData[4]*5;
+          }
+
+          if(parseInt(options[6]) >= 50){////////Target has 50+ attack power
+            //console.log('High Damage');
+            finalScore += (parseInt(options[6])*.5) + 40;
+          }
+
+          if(strikeData[1] == 2){/////////Target is flanked by 2 others --> Special attack
+            //console.log('Triple Target')
+            atktype = 1;
+            finalScore += 5;
+            if(strikeData[9] == 1){
+              masterStrikeIndirect = 1;
+            }
+          }
+
+          if(masterStrikeIndirect == 1){////////If triple attack can be used to hit a master as well.
+            atktype = 1;
+          }
+          if(masterKilldirect == 1){
+            atktype = 0;
+          }
+
+          return [finalScore, atktype, options];
         }
   </script>
 </head>
