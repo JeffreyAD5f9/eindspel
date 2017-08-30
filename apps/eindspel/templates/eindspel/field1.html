@@ -171,7 +171,7 @@
                         spString = spString +onSpace[i];
                       }
                     }
-                    console.log(parseInt(spString));
+                    //console.log(parseInt(spString));
                     spaceInt = parseInt(spString);
                     var logSpace = spaceInt;
                     stepByStepCalc = spaceInt;
@@ -223,7 +223,7 @@
                         spaceStr = spaceStr + '#T' + (moveSpaces[i].toString()) + ', '
                       }
                     }
-                    console.log(spaceStr);
+                    //console.log(spaceStr);
                     setSpaces = spaceStr;
 
                     /////////////////Compile array of spaces to be visible/////////////////
@@ -319,7 +319,6 @@
                     if(difference > logMove){
                       difference = difference/8;
                     }
-                  console.log(difference);
                   opSetCost = difference;
                 }////////////////end if piece is being moved (rather than set)//////////////////////
                   operationPts -= opSetCost;
@@ -517,6 +516,7 @@
             ///Animation///
             enemiesOnField = document.getElementsByClassName('enemy');
             for(e=0; e<enemiesOnField.length; e++){
+              var targetAcquired = [0, 0, 0, 0];
               var enemyAtk = enemiesOnField[e].parentElement.getElementsByClassName('infoAtk')[0].value;
               var targetsOnField = [];
               var all = document.getElementsByClassName('infoPlace');/////Find all of the user's pieces
@@ -527,9 +527,28 @@
               }
               for(t=0; t<targetsOnField.length; t++){////////
                 var scoreData = scoreTarget(targetsOnField[t], enemyAtk);
-                console.log(scoreData); //////[finalScore, atktype]
+                //console.log(scoreData); //////[targetSpace, finalScore, atktype, options]
+                // options: [prioritySpace, secondarySpace, alignSpace, approachSpace, targetHP, targetDef, targetAtk]
+                if(scoreData[1] > targetAcquired[1]){
+                  targetAcquired = scoreData;
+                }
 
               }
+              console.log(enemiesOnField[e]);
+              console.log('targetAcquired');
+              console.log(targetAcquired);
+
+              if(targetAcquired[3][0] == 1){
+                console.log('Move for Direct Attack');
+                //move to alignSpace
+                //attack with direct attack
+              }
+              else if(targetAcquired[3][1] == 1){
+                console.log('Move for Indirect Attack');
+                //move to approachSpace
+                //attack with indirect attack
+              }
+              //else if()
             }////////End for all enemies on Field
 
 
@@ -769,6 +788,7 @@
               targetSpace = targetSpace + targetOnSpace[k];
             }
           }
+          var enemySpaceInt = parseInt(enemyOnSpace[1] + enemyOnSpace[2]);
           targetInt = parseInt(targetSpace);
           targetArray.push(targetInt - 8);/////Priority space
           targetArray.push(targetInt - 7);/////secondary spaces
@@ -776,22 +796,49 @@
           var moveResult = checkMove(enemyMovementValue, enemyOnSpace);//Check spaces the enemy can move to
           var enemySpaceArray = moveResult[0];////////moveable Spaces in #id format for moving
           var enemyArrayInt = moveResult[1];///////spaces in number format for comparison
+          var highestValueSpace = 0;
+          var targetRow = Math.ceil((targetInt)/8);
+          var enemyRow = Math.ceil((enemySpaceInt)/8);
           var prioritySpace = 0;/////Priority space
           var secondarySpace = 0;/////secondary spaces
           var alignSpace = 0;/////If piece cannot be reached find a space that is in line with it
           var approachSpace = 0;/////If piece cannot be reached find a space that is closer to it
+          var rightSpace = 0;
+          var leftSpace = 0;
           for(i=0; i<enemyArrayInt.length; i++){
-            if(enemyArrayInt[i] > approachSpace){
-              approachSpace = enemyArrayInt[i];
+            //console.log(Math.ceil((enemyArrayInt[i])/8));
+            if(targetRow < enemyRow){
+              if(Math.ceil((enemyArrayInt[i])/8) == targetRow){
+                approachSpace = enemyArrayInt[0];
+              }
             }
+            else if(targetRow > enemyRow){
+              if(enemyArrayInt[i] > approachSpace){
+                approachSpace = enemyArrayInt[i];
+              }
+            }
+            else{
+              if(targetInt < enemySpaceInt){
+                if((enemyArrayInt[i]/8) % 1 < (leftSpace/8)% 1 && (enemyArrayInt[i]/8) % 1 != 0 || leftSpace == 0){
+                  leftSpace = enemyArrayInt[i];
+                }
+              }
+              else{
+                if((enemyArrayInt[i]/8) % 1 > (rightSpace/8)% 1){
+                  rightSpace = enemyArrayInt[i];
+                }
+              }
+            }
+
             if (enemyArrayInt[i] == targetArray[0]){
-              prioritySpace = 1;
+              prioritySpace = enemyArrayInt[i];
+              alignSpace = enemyArrayInt[i];
             }
             if (enemyArrayInt[i] == targetArray[1]){
-              secondarySpace = 1;
+              secondarySpace = enemyArrayInt[i];
             }
             if (enemyArrayInt[i] == targetArray[2]){
-              secondarySpace = 1;
+              secondarySpace = enemyArrayInt[i];
             }
             if (enemyArrayInt[i] == targetArray[0] - 40){
               alignSpace = enemyArrayInt[i];
@@ -809,14 +856,14 @@
               alignSpace = enemyArrayInt[i];
             }
           }
-          return [prioritySpace, secondarySpace, alignSpace, approachSpace, targetHP, targetDef, targetAtk];
+          return [prioritySpace, secondarySpace, leftSpace, rightSpace, alignSpace, approachSpace, targetHP, targetDef, targetAtk];
         }
 
         function checkSides(spaceInput){
           var sides = [];
           var spaceIntCS = parseInt(spaceInput[1] + spaceInput[2]);
           if((spaceIntCS/8 % 1) != 0){
-            if(spaceIntCS < 10){
+            if(spaceIntCS+1 < 10){
               sides.push("T0" + String(spaceIntCS+1));
             }
             else{
@@ -824,7 +871,7 @@
             }
           }
           if(((spaceIntCS-1)/8 % 1) != 0){
-            if(spaceIntCS < 10){
+            if(spaceIntCS-1 < 10){
               sides.push("T0" + String(spaceIntCS-1));
             }
             else{
@@ -833,16 +880,19 @@
           }
           return sides;
         }
+
+
         function checkSurround(spaceInput){
           var surroundings = [];
           var frontAndBack = [];
           var sides = checkSides(spaceInput);
+
           for(y=0; y<sides.length; y++){
             surroundings.push(sides[y]);
           }
           var spaceIntCS = parseInt(spaceInput[1] + spaceInput[2]);
           if((spaceIntCS-8) >= 1){//Front
-            if(spaceIntCS < 10){
+            if(spaceIntCS-8 < 10){
               frontAndBack.push("T0" + String(spaceIntCS-8));
               surroundings.push("T0" + String(spaceIntCS-8));
             }
@@ -852,7 +902,7 @@
             }
           }
           if((spaceIntCS+8) <= 64){//Back
-            if(spaceIntCS < 10){
+            if(spaceIntCS+8 < 10){
               frontAndBack.push("T0" + String(spaceIntCS+8));
               surroundings.push("T0" + String(spaceIntCS+8));
             }
@@ -889,6 +939,7 @@
           var options = checkTargetOptions(targetDiv, enemiesOnField[e]);
           var sideSpaces = checkSides(targetScored);
           var surroundSpaces = checkSurround(targetScored);
+
           if(ability[0] == '1'){
             master = 1;
           }
@@ -950,6 +1001,8 @@
           strikeData.push(masterOnSurround);
 
           //console.log(strikeData);
+          var strikeScore = 0;
+          var moveScore = 0;
           var finalScore = 0;
           var atktype = 0;
           var masterKilldirect = 0;
@@ -960,60 +1013,60 @@
           if(strikeData[0] == 1){/////////If target is Master
             //console.log('Master');
             if (parseInt(options[4]) - damageTotal <= 0){///////////If Kill on master
-              finalScore += 400;
+              strikeScore += 400;
               masterKill = 1;
             }
             if(parseInt(options[4]) - damageTotal <= parseInt(atkValue)){////////////If Critical damage on Master
-              finalScore += 70;
+              strikeScore += 70;
             }
           }
 
           if(strikeData[5] == 1){////////Target is Defense Support type one (sides only)
             //console.log('DefenseSupport');
             if(strikeData[9] == 1){//////If it supports the Master
-              finalScore += 60;
+              strikeScore += 60;
             }
           }
 
           if(strikeData[6] == 1){////////Target is Defense Support type two (surroundings)
             //console.log('DefenseSupport2');
             if(strikeData[10] == 1){//////If it supports the Master
-              finalScore += 60;
+              strikeScore += 60;
             }
             else{
-              finalScore += 50;
+              strikeScore += 50;
             }
           }
 
           if(strikeData[7] == 1){////////Target is Attack Support
             //console.log('AttackSupport');
-            finalScore += 40;
+            strikeScore += 40;
           }
 
           if(strikeData[8] == 1){////////Target is Speed Support
             //console.log('AttackSupport');
-            finalScore += 40;
+            strikeScore += 40;
           }
 
           if(strikeData[3] != 0){////////Target has counter damage factor
             //console.log('Counter');
-            finalScore -= strikeData[3]*5;
+            strikeScore -= strikeData[3]*5;
           }
 
           if(strikeData[4] != 0){////////Target has counter damage support factor
             //console.log('CounterSupport');
-            finalScore -= strikeData[4]*5;
+            strikeScore -= strikeData[4]*5;
           }
 
           if(parseInt(options[6]) >= 50){////////Target has 50+ attack power
             //console.log('High Damage');
-            finalScore += (parseInt(options[6])*.5) + 40;
+            strikeScore += (parseInt(options[6])*.5) + 40;
           }
 
           if(strikeData[1] == 2){/////////Target is flanked by 2 others --> Special attack
             //console.log('Triple Target')
             atktype = 1;
-            finalScore += 5;
+            strikeScore += 5;
             if(strikeData[9] == 1){
               masterStrikeIndirect = 1;
             }
@@ -1026,7 +1079,18 @@
             atktype = 0;
           }
 
-          return [finalScore, atktype, options];
+          if(options[0] == 1){
+            //console.log('Target Directly Vulnerable');
+            moveScore += 500;
+          }
+          if(options[1] == 1){
+            //console.log('Target Indirectly Vulnerable');
+            moveScore += 300;
+          }
+
+          finalScore = strikeScore + moveScore;
+
+          return [targetScored, finalScore, atktype, options];
         }
   </script>
 </head>
