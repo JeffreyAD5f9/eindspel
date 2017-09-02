@@ -528,7 +528,7 @@
               for(t=0; t<targetsOnField.length; t++){////////
                 var scoreData = scoreTarget(targetsOnField[t], enemyAtk);
                 //console.log(scoreData); //////[targetSpace, finalScore, atktype, options]
-                // options: [prioritySpace, secondarySpace, alignSpace, approachSpace, targetHP, targetDef, targetAtk]
+                // options: [prioritySpace, secondarySpace, leftSpace, rightSpace, alignSpace, approachSpace, targetHP, // targetDef, targetAtk];
                 if(scoreData[1] > targetAcquired[1]){
                   targetAcquired = scoreData;
                 }
@@ -540,15 +540,28 @@
 
               if(targetAcquired[3][0] == 1){
                 console.log('Move for Direct Attack');
-                //move to alignSpace
-                //attack with direct attack
+    
               }
               else if(targetAcquired[3][1] == 1){
                 console.log('Move for Indirect Attack');
-                //move to approachSpace
-                //attack with indirect attack
+
               }
-              //else if()
+              else if(targetAcquired[3][2] != 0){
+                console.log('Move for Sideways Attack');
+
+              }
+              else if(targetAcquired[3][3] != 0){
+                console.log('Move for Sideways Attack');
+
+              }
+              else if(targetAcquired[3][4] != 0){
+                console.log('Move to AlignSpace');
+
+              }
+              else if(targetAcquired[3][5] != 0){
+                console.log('Move to ApproachSpace');
+
+              }
             }////////End for all enemies on Field
 
 
