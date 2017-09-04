@@ -511,9 +511,7 @@
             document.getElementById('phaseIndicator').innerHTML = "Phase: " + phase;
 
 
-            ///Animation////
-            slash();
-            ///Animation///
+
             enemiesOnField = document.getElementsByClassName('enemy');
             for(e=0; e<enemiesOnField.length; e++){
               var targetAcquired = [0, 0, 0, 0];
@@ -528,7 +526,7 @@
               for(t=0; t<targetsOnField.length; t++){////////
                 var scoreData = scoreTarget(targetsOnField[t], enemyAtk);
                 //console.log(scoreData); //////[targetSpace, finalScore, atktype, options]
-                // options: [prioritySpace, secondarySpace, leftSpace, rightSpace, alignSpace, approachSpace, targetHP, // targetDef, targetAtk];
+                // options: [prioritySpace, secondarySpace, leftSpace, rightSpace, alignSpace, approachSpace, targetHP, // targetDef, targetAtk, enemySpaceInt, targetInt];
                 if(scoreData[1] > targetAcquired[1]){
                   targetAcquired = scoreData;
                 }
@@ -538,31 +536,48 @@
               console.log('targetAcquired');
               console.log(targetAcquired);
 
-              if(targetAcquired[3][0] == 1){
+              if(targetAcquired[3][4] == targetAcquired[3][5]){
+                var lateralDiff = 0;
+                console.log(lateralDiff);
+              }
+              else{
+                var lateralDiff = Math.abs((targetAcquired[3][4]) - (targetAcquired[3][9]));
+                console.log(lateralDiff);
+              }
+
+              var verticalDiff = Math.abs(((targetAcquired[3][4]) - (targetAcquired[3][10]))/8);
+              console.log(verticalDiff);
+
+              if(targetAcquired[3][0] != 0){//////////Can hit with direct attack
                 console.log('Move for Direct Attack');
-    
+                console.log(targetAcquired[3][0]);
               }
-              else if(targetAcquired[3][1] == 1){
+              else if(targetAcquired[3][1] != 0){//////////Can hit with indirect attack
                 console.log('Move for Indirect Attack');
-
+                console.log(targetAcquired[3][1]);
               }
-              else if(targetAcquired[3][2] != 0){
+              else if(targetAcquired[3][2] != 0){//////////Can hit with side attack
                 console.log('Move for Sideways Attack');
 
               }
-              else if(targetAcquired[3][3] != 0){
+              else if(targetAcquired[3][3] != 0){//////////Can hit with side attack
                 console.log('Move for Sideways Attack');
 
               }
-              else if(targetAcquired[3][4] != 0){
-                console.log('Move to AlignSpace');
+              else if(lateralDiff < verticalDiff){//////////Can hit with side attack
+                console.log('Forward Move');
 
               }
-              else if(targetAcquired[3][5] != 0){
-                console.log('Move to ApproachSpace');
+              else{
+                console.log('Lateral Move');
 
               }
+
             }////////End for all enemies on Field
+
+          ///Animation////
+          //slash();
+          ///Animation///
 
 
           //  var initiate = setInterval(function(){
@@ -869,7 +884,7 @@
               alignSpace = enemyArrayInt[i];
             }
           }
-          return [prioritySpace, secondarySpace, leftSpace, rightSpace, alignSpace, approachSpace, targetHP, targetDef, targetAtk];
+          return [prioritySpace, secondarySpace, leftSpace, rightSpace, alignSpace, approachSpace, targetHP, targetDef, targetAtk, enemySpaceInt, targetInt];
         }
 
         function checkSides(spaceInput){
