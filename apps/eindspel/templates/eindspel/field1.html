@@ -526,7 +526,7 @@
               for(t=0; t<targetsOnField.length; t++){////////
                 var scoreData = scoreTarget(targetsOnField[t], enemyAtk);
                 //console.log(scoreData); //////[targetSpace, finalScore, atktype, options]
-                // options: [prioritySpace, secondarySpace, leftSpace, rightSpace, alignSpace, approachSpace, targetHP, // targetDef, targetAtk, enemySpaceInt, targetInt];
+                // options: [prioritySpace, secondarySpace, leftSpace, rightSpace, alignSpace, approachSpace, targetHP, // targetDef, targetAtk, enemySpaceInt, targetInt, targetRow, enemyRow];
                 if(scoreData[1] > targetAcquired[1]){
                   targetAcquired = scoreData;
                 }
@@ -538,39 +538,77 @@
 
               if(targetAcquired[3][4] == targetAcquired[3][5]){
                 var lateralDiff = 0;
-                console.log(lateralDiff);
+                //console.log(lateralDiff);
               }
               else{
                 var lateralDiff = Math.abs((targetAcquired[3][4]) - (targetAcquired[3][9]));
-                console.log(lateralDiff);
+                //console.log(lateralDiff);
               }
 
               var verticalDiff = Math.abs(((targetAcquired[3][4]) - (targetAcquired[3][10]))/8);
-              console.log(verticalDiff);
+              //console.log(verticalDiff);
+              var moveToSpace = '';
+              var addOn = "T";
+              var rowDiff = targetAcquired[3][12] - targetAcquired[3][11];/////////Difference in Rows
+              var latDiff = targetAcquired[3][5] - targetAcquired[3][10];///////Difference in lateral spaces
 
               if(targetAcquired[3][0] != 0){//////////Can hit with direct attack
                 console.log('Move for Direct Attack');
-                console.log(targetAcquired[3][0]);
+                if(targetAcquired[3][0] < 10){
+                  addOn = "T0";
+                }
+                moveToSpace = String(targetAcquired[3][0]);
+                console.log(addOn + moveToSpace);
+                //document.getElementById()
               }
               else if(targetAcquired[3][1] != 0){//////////Can hit with indirect attack
                 console.log('Move for Indirect Attack');
-                console.log(targetAcquired[3][1]);
+                if(targetAcquired[3][1] < 10){
+                  addOn = "T0";
+                }
+                moveToSpace = String(targetAcquired[3][1]);
+                console.log(addOn + moveToSpace);
               }
               else if(targetAcquired[3][2] != 0){//////////Can hit with side attack
                 console.log('Move for Sideways Attack');
-
+                if(targetAcquired[3][2] < 10){
+                  addOn = "T0";
+                }
+                moveToSpace = String(targetAcquired[3][2]);
+                console.log(addOn + moveToSpace);
               }
               else if(targetAcquired[3][3] != 0){//////////Can hit with side attack
                 console.log('Move for Sideways Attack');
-
+                if(targetAcquired[3][3] < 10){
+                  addOn = "T0";
+                }
+                moveToSpace = String(targetAcquired[3][3]);
+                console.log(addOn + moveToSpace);
               }
               else if(lateralDiff < verticalDiff){//////////Can hit with side attack
                 console.log('Forward Move');
-
+                if(targetAcquired[3][5] < 10){
+                  addOn = "T0";
+                }
+                moveToSpace = String(targetAcquired[3][5]);
+                console.log(addOn + moveToSpace);
+              }
+              else if(targetAcquired[3][11] < targetAcquired[3][12] && rowDiff >= latDiff){
+                //////////Target Behind enemy
+                console.log('Backward Move');
+                if(targetAcquired[3][5] < 10){
+                  addOn = "T0";
+                }
+                moveToSpace = String(targetAcquired[3][5]);
+                console.log(addOn + moveToSpace);
               }
               else{
                 console.log('Lateral Move');
-
+                if(targetAcquired[3][4] < 10){
+                  addOn = "T0";
+                }
+                moveToSpace = String(targetAcquired[3][4]);
+                console.log(addOn + moveToSpace);
               }
 
             }////////End for all enemies on Field
@@ -883,8 +921,23 @@
             if (enemyArrayInt[i] == targetArray[0] - 8){
               alignSpace = enemyArrayInt[i];
             }
+            if (enemyArrayInt[i] == targetInt + 8){
+              alignSpace = enemyArrayInt[i];
+            }
+            if (enemyArrayInt[i] == targetInt + 16){
+              alignSpace = enemyArrayInt[i];
+            }
+            if (enemyArrayInt[i] == targetInt + 24){
+              alignSpace = enemyArrayInt[i];
+            }
+            if (enemyArrayInt[i] == targetInt + 32){
+              alignSpace = enemyArrayInt[i];
+            }
+            if (enemyArrayInt[i] == targetInt + 40){
+              alignSpace = enemyArrayInt[i];
+            }
           }
-          return [prioritySpace, secondarySpace, leftSpace, rightSpace, alignSpace, approachSpace, targetHP, targetDef, targetAtk, enemySpaceInt, targetInt];
+          return [prioritySpace, secondarySpace, leftSpace, rightSpace, alignSpace, approachSpace, targetHP, targetDef, targetAtk, enemySpaceInt, targetInt, targetRow, enemyRow];
         }
 
         function checkSides(spaceInput){
@@ -1107,11 +1160,11 @@
             atktype = 0;
           }
 
-          if(options[0] == 1){
+          if(options[0] != 0){
             //console.log('Target Directly Vulnerable');
             moveScore += 500;
           }
-          if(options[1] == 1){
+          if(options[1] != 0){
             //console.log('Target Indirectly Vulnerable');
             moveScore += 300;
           }
