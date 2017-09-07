@@ -526,8 +526,8 @@
               for(t=0; t<targetsOnField.length; t++){////////
                 var scoreData = scoreTarget(targetsOnField[t], enemyAtk);
                 //console.log(scoreData); //////[targetSpace, finalScore, atktype, options]
-                // options: [prioritySpace, secondarySpace, leftSpace, rightSpace, alignSpace, approachSpace, targetHP, // targetDef, targetAtk, enemySpaceInt, targetInt, targetRow, enemyRow];
-                if(scoreData[1] > targetAcquired[1]){
+                // options: [prioritySpace, secondarySpace, leftSpace, rightSpace, alignSpace, approachSpace, targetHP, targetDef, targetAtk, enemySpaceInt, targetInt, targetRow, enemyRow, enemyOnSpace];
+                if(scoreData[1] >= targetAcquired[1]){
                   targetAcquired = scoreData;
                 }
 
@@ -551,6 +551,7 @@
               var addOn = "T";
               var rowDiff = targetAcquired[3][12] - targetAcquired[3][11];/////////Difference in Rows
               var latDiff = targetAcquired[3][5] - targetAcquired[3][10];///////Difference in lateral spaces
+              var enemyHTML = '';
 
               if(targetAcquired[3][0] != 0){//////////Can hit with direct attack
                 console.log('Move for Direct Attack');
@@ -558,8 +559,12 @@
                   addOn = "T0";
                 }
                 moveToSpace = String(targetAcquired[3][0]);
-                console.log(addOn + moveToSpace);
-                //document.getElementById()
+                moveToSpace = addOn + moveToSpace;
+                console.log(moveToSpace);
+                enemyHTML = document.getElementById(targetAcquired[3][13]).innerHTML
+                document.getElementById(moveToSpace).innerHTML = enemyHTML
+                document.getElementById(targetAcquired[3][13]).innerHTML = '';
+                $('.Show').hide();
               }
               else if(targetAcquired[3][1] != 0){//////////Can hit with indirect attack
                 console.log('Move for Indirect Attack');
@@ -567,7 +572,12 @@
                   addOn = "T0";
                 }
                 moveToSpace = String(targetAcquired[3][1]);
-                console.log(addOn + moveToSpace);
+                moveToSpace = addOn + moveToSpace;
+                console.log(moveToSpace);
+                enemyHTML = document.getElementById(targetAcquired[3][13]).innerHTML
+                document.getElementById(moveToSpace).innerHTML = enemyHTML
+                document.getElementById(targetAcquired[3][13]).innerHTML = '';
+                $('.Show').hide();
               }
               else if(targetAcquired[3][2] != 0){//////////Can hit with side attack
                 console.log('Move for Sideways Attack');
@@ -575,7 +585,12 @@
                   addOn = "T0";
                 }
                 moveToSpace = String(targetAcquired[3][2]);
-                console.log(addOn + moveToSpace);
+                moveToSpace = addOn + moveToSpace;
+                console.log(moveToSpace);
+                enemyHTML = document.getElementById(targetAcquired[3][13]).innerHTML
+                document.getElementById(moveToSpace).innerHTML = enemyHTML
+                document.getElementById(targetAcquired[3][13]).innerHTML = '';
+                $('.Show').hide();
               }
               else if(targetAcquired[3][3] != 0){//////////Can hit with side attack
                 console.log('Move for Sideways Attack');
@@ -583,7 +598,12 @@
                   addOn = "T0";
                 }
                 moveToSpace = String(targetAcquired[3][3]);
-                console.log(addOn + moveToSpace);
+                moveToSpace = addOn + moveToSpace;
+                console.log(moveToSpace);
+                enemyHTML = document.getElementById(targetAcquired[3][13]).innerHTML
+                document.getElementById(moveToSpace).innerHTML = enemyHTML
+                document.getElementById(targetAcquired[3][13]).innerHTML = '';
+                $('.Show').hide();
               }
               else if(lateralDiff < verticalDiff){//////////Can hit with side attack
                 console.log('Forward Move');
@@ -591,7 +611,12 @@
                   addOn = "T0";
                 }
                 moveToSpace = String(targetAcquired[3][5]);
-                console.log(addOn + moveToSpace);
+                moveToSpace = addOn + moveToSpace;
+                console.log(moveToSpace);
+                enemyHTML = document.getElementById(targetAcquired[3][13]).innerHTML
+                document.getElementById(moveToSpace).innerHTML = enemyHTML
+                document.getElementById(targetAcquired[3][13]).innerHTML = '';
+                $('.Show').hide();
               }
               else if(targetAcquired[3][11] < targetAcquired[3][12] && rowDiff >= latDiff){
                 //////////Target Behind enemy
@@ -600,42 +625,68 @@
                   addOn = "T0";
                 }
                 moveToSpace = String(targetAcquired[3][5]);
-                console.log(addOn + moveToSpace);
+                moveToSpace = addOn + moveToSpace;
+                console.log(moveToSpace);
+                enemyHTML = document.getElementById(targetAcquired[3][13]).innerHTML
+                document.getElementById(moveToSpace).innerHTML = enemyHTML
+                document.getElementById(targetAcquired[3][13]).innerHTML = '';
+                $('.Show').hide();
               }
               else{
                 console.log('Lateral Move');
-                if(targetAcquired[3][4] < 10){
-                  addOn = "T0";
+                if(targetAcquired[3][14] != targetAcquired[3][9]){
+                  if(targetAcquired[3][14] < 10){
+                    addOn = "T0";
+                  }
+                  moveToSpace = String(targetAcquired[3][14]);
                 }
-                moveToSpace = String(targetAcquired[3][4]);
-                console.log(addOn + moveToSpace);
+                if(targetAcquired[3][15] != targetAcquired[3][9]){
+                  if(targetAcquired[3][15] < 10){
+                    addOn = "T0";
+                  }
+                  moveToSpace = String(targetAcquired[3][15]);
+                }
+                else{
+                  if(targetAcquired[3][5] < 10){
+                    addOn = "T0";
+                  }
+                  moveToSpace = String(targetAcquired[3][5]);
+                }
+
+
+                moveToSpace = addOn + moveToSpace;
+                console.log(moveToSpace);
+                enemyHTML = document.getElementById(targetAcquired[3][13]).innerHTML
+                document.getElementById(moveToSpace).innerHTML = enemyHTML
+                document.getElementById(targetAcquired[3][13]).innerHTML = '';
+                $('.Show').hide();
               }
 
             }////////End for all enemies on Field
 
           ///Animation////
-          //slash();
+          slash();
           ///Animation///
 
 
-          //  var initiate = setInterval(function(){
-          //    phase = "Calculating"
-          //    document.getElementById('phaseIndicator').innerHTML = "Phase: " + phase;
-          //    clearInterval(initiate);
-          //  }, 1000);
+            var initiate = setInterval(function(){
+              phase = "Calculating"
+              document.getElementById('phaseIndicator').innerHTML = "Phase: " + phase;
+              clearInterval(initiate);
+            }, 1000);
             ////////////Shift Phase back to user control/////////////////
-          //  var shiftBack = setInterval(function(){
-          //    phase = "Deploy"
-          //    document.getElementById('phaseIndicator').innerHTML = "Phase: " + phase;
-          //    operationPts = 25;
-          //    document.getElementById('operationIndicator').innerHTML = operationPts;
-          //    clearInterval(shiftBack);
-          //  }, 2000);
+            var shiftBack = setInterval(function(){
+              phase = "Deploy"
+              document.getElementById('phaseIndicator').innerHTML = "Phase: " + phase;
+              operationPts = 25;
+              document.getElementById('operationIndicator').innerHTML = operationPts;
+              clearInterval(shiftBack);
+            }, 2000);
             ////////////Shift Phase back to user control/////////////////
-          //  reactivate = document.getElementsByClassName('activeStatus');///////////reactivate all used pieces/////////
-          //  for(i=0; i<reactivate.length; i++){
-          //    reactivate[i].value = "active";
-          //  }
+            reactivate = document.getElementsByClassName('activeStatus');///////////reactivate all used pieces/////////
+            for(i=0; i<reactivate.length; i++){
+              reactivate[i].value = "active";
+            }
           }
           if (phase == "Deploy"){//////Switching from Deploy to Strike/////////////
             phase = "Strike";
@@ -870,12 +921,28 @@
           var alignSpace = 0;/////If piece cannot be reached find a space that is in line with it
           var approachSpace = 0;/////If piece cannot be reached find a space that is closer to it
           var rightSpace = 0;
+          var hardRight = enemySpaceInt;
           var leftSpace = 0;
+          var hardLeft = enemySpaceInt;
           for(i=0; i<enemyArrayInt.length; i++){
             //console.log(Math.ceil((enemyArrayInt[i])/8));
             if(targetRow < enemyRow){
               if(Math.ceil((enemyArrayInt[i])/8) == targetRow){
                 approachSpace = enemyArrayInt[0];
+              }
+              if( ((enemySpaceInt - ((enemyRow - targetRow)*8)) - targetInt) < 0 ){
+                console.log('right side');
+                console.log((enemyArrayInt[i] - ((enemyRow - targetRow)*8)));
+                if( (enemyArrayInt[i] - ((enemyRow - targetRow)*8)) > hardRight ){
+                  hardRight = enemyArrayInt[i];
+                }
+              }
+              if( ((enemySpaceInt - ((enemyRow - targetRow)*8)) - targetInt) > 0 ){
+                console.log('left side');
+                console.log((enemyArrayInt[i] - ((enemyRow - targetRow)*8)));
+                if( (enemyArrayInt[i] - ((enemyRow - targetRow)*8)) < hardLeft ){
+                  hardLeft = enemyArrayInt[i];
+                }
               }
             }
             else if(targetRow > enemyRow){
@@ -937,7 +1004,7 @@
               alignSpace = enemyArrayInt[i];
             }
           }
-          return [prioritySpace, secondarySpace, leftSpace, rightSpace, alignSpace, approachSpace, targetHP, targetDef, targetAtk, enemySpaceInt, targetInt, targetRow, enemyRow];
+          return [prioritySpace, secondarySpace, leftSpace, rightSpace, alignSpace, approachSpace, targetHP, targetDef, targetAtk, enemySpaceInt, targetInt, targetRow, enemyRow, enemyOnSpace, hardLeft, hardRight];
         }
 
         function checkSides(spaceInput){
