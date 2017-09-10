@@ -526,7 +526,7 @@
               for(t=0; t<targetsOnField.length; t++){////////
                 var scoreData = scoreTarget(targetsOnField[t], enemyAtk);
                 //console.log(scoreData); //////[targetSpace, finalScore, atktype, options]
-                // options: [prioritySpace, secondarySpace, leftSpace, rightSpace, alignSpace, approachSpace, targetHP, targetDef, targetAtk, enemySpaceInt, targetInt, targetRow, enemyRow, enemyOnSpace];
+                // options: [prioritySpace, secondarySpace, leftSpace, rightSpace, alignSpace, approachSpace, targetHP, targetDef, targetAtk, enemySpaceInt, targetInt, targetRow, enemyRow, enemyOnSpace, hardLeft, hardRight, targetOnSpace];
                 if(scoreData[1] >= targetAcquired[1]){
                   targetAcquired = scoreData;
                 }
@@ -565,6 +565,10 @@
                 document.getElementById(moveToSpace).innerHTML = enemyHTML
                 document.getElementById(targetAcquired[3][13]).innerHTML = '';
                 $('.Show').hide();
+
+                var scanArray = attackScan(targetAcquired[3][16]);
+                console.log(scanArray); ///scanArray [defBonus, counterBonus]
+
               }///////////////////////////////////////////////////////////
               else if(targetAcquired[3][1] != 0){//////////Can hit with indirect attack
                 console.log('Move for Indirect Attack');
@@ -578,6 +582,10 @@
                 document.getElementById(moveToSpace).innerHTML = enemyHTML
                 document.getElementById(targetAcquired[3][13]).innerHTML = '';
                 $('.Show').hide();
+
+                ////use checksides on targetAcquired
+                ////for each target found, run attackScan
+                ////combine the attackscan results
               }///////////////////////////////////////////////////////////
               else if(targetAcquired[3][2] != 0){//////////Can hit with side attack
                 console.log('Move for Sideways Attack');
@@ -998,7 +1006,7 @@
             }
           }
           console.log(approachSpace);
-          return [prioritySpace, secondarySpace, leftSpace, rightSpace, alignSpace, approachSpace, targetHP, targetDef, targetAtk, enemySpaceInt, targetInt, targetRow, enemyRow, enemyOnSpace, hardLeft, hardRight];
+          return [prioritySpace, secondarySpace, leftSpace, rightSpace, alignSpace, approachSpace, targetHP, targetDef, targetAtk, enemySpaceInt, targetInt, targetRow, enemyRow, enemyOnSpace, hardLeft, hardRight, targetOnSpace];
         }
 
         function checkSides(spaceInput){
@@ -1233,6 +1241,42 @@
           finalScore = strikeScore + moveScore;
 
           return [targetScored, finalScore, atktype, options];
+        }
+
+        function attackScan(enemyInt){
+          var surroundScan = checkSurround(enemyInt);
+          var sideScan = checkSides(enemyInt);
+          var surrArray = [];
+          var sideArray = [];
+
+          var defBonus = 0;
+          var counterBonus = 0;
+
+          for(var v=0; v<surroundScan.length; v++){
+            if(document.getElementById(surroundScan[v]).getElementsByClassName('infoAbil')[0]){
+              surrArray.push(document.getElementById(surroundScan[v]).getElementsByClassName('infoAbil')[0].value);
+            }
+          }
+          for(var v=0; v<sideScan.length; v++){
+            if(document.getElementById(sideScan[v]).getElementsByClassName('infoAbil')[0]){
+              sideArray.push(document.getElementById(sideScan[v]).getElementsByClassName('infoAbil')[0].value);
+            }
+          }
+          for(var v=0; v<surrArray.length; v++){
+            if(surrArray[v][3] == 1){
+              defBonus+= 1;
+            }
+          }
+          for(var v=0; v<sideArray.length; v++){
+            if(surrArray[v][1] == 1){
+              defBonus+= 1;
+            }
+            if(surrArray[v][2] == 1){
+              counterBonus+= 1;
+            }
+          }
+
+          return [defBonus, counterBonus];
         }
   </script>
 </head>
