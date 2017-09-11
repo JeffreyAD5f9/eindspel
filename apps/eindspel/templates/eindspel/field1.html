@@ -568,7 +568,9 @@
 
                 var scanArray = attackScan(targetAcquired[3][16]);
                 console.log(scanArray); ///scanArray [defBonus, counterBonus]
-
+                ///Animation////
+                slash();
+                ///Animation///
               }///////////////////////////////////////////////////////////
               else if(targetAcquired[3][1] != 0){//////////Can hit with indirect attack
                 console.log('Move for Indirect Attack');
@@ -583,9 +585,20 @@
                 document.getElementById(targetAcquired[3][13]).innerHTML = '';
                 $('.Show').hide();
 
-                ////use checksides on targetAcquired
+                ////use checkSides on targetAcquired
+                var centerSpace = "T" + String(targetAcquired[3][1] + 8);
+                var attackSpaceArray = checkSides(centerSpace);
+                attackSpaceArray.push(centerSpace);Animation
+                console.log(attackSpaceArray);
                 ////for each target found, run attackScan
-                ////combine the attackscan results
+                for(var v=0; v<attackSpaceArray.length; v++){
+                  if(document.getElementById(attackSpaceArray[v]).getElementsByClassName('infoAbil')[0]){
+                    console.log(attackScan(attackSpaceArray[v]));
+                  }
+                }
+                ///Animation////
+                flare();
+                ///Animation///
               }///////////////////////////////////////////////////////////
               else if(targetAcquired[3][2] != 0){//////////Can hit with side attack
                 console.log('Move for Sideways Attack');
@@ -599,6 +612,13 @@
                 document.getElementById(moveToSpace).innerHTML = enemyHTML
                 document.getElementById(targetAcquired[3][13]).innerHTML = '';
                 $('.Show').hide();
+
+                var attackSpaceArray = checkSides(moveToSpace);
+                for(var v=0; v<attackSpaceArray.length; v++){
+                  if(document.getElementById(attackSpaceArray[v]).getElementsByClassName('infoAbil')[0]){
+                    console.log(attackScan(attackSpaceArray[v]));
+                  }
+                }
               }///////////////////////////////////////////////////////////
               else if(targetAcquired[3][3] != 0){//////////Can hit with side attack
                 console.log('Move for Sideways Attack');
@@ -612,19 +632,42 @@
                 document.getElementById(moveToSpace).innerHTML = enemyHTML
                 document.getElementById(targetAcquired[3][13]).innerHTML = '';
                 $('.Show').hide();
+
+                var attackSpaceArray = checkSides(moveToSpace);
+                for(var v=0; v<attackSpaceArray.length; v++){
+                  if(document.getElementById(attackSpaceArray[v]).getElementsByClassName('infoAbil')[0]){
+                    console.log(attackScan(attackSpaceArray[v]));
+                  }
+                }
               }///////////////////////////////////////////////////////////
               else if(lateralDiff < verticalDiff){//////////Can hit with side attack
                 console.log('Forward Move');
                 if(targetAcquired[3][5] < 10){
                   addOn = "T0";
                 }
-                moveToSpace = String(targetAcquired[3][5]);
+                moveToSpace = String(targetAcquired[3][5]);/////////Use what's in this slot later
                 moveToSpace = addOn + moveToSpace;
                 console.log(moveToSpace);
                 enemyHTML = document.getElementById(targetAcquired[3][13]).innerHTML
                 document.getElementById(moveToSpace).innerHTML = enemyHTML
                 document.getElementById(targetAcquired[3][13]).innerHTML = '';
                 $('.Show').hide();
+
+                //check for targets after moving
+                var checkSpaceArray1 = checkSides(moveToSpace);
+                for(var v=0; v<checkSpaceArray1.length; v++){
+                  if(document.getElementById(checkSpaceArray1[v]).getElementsByClassName('infoAbil')[0]){
+                    console.log(attackScan(checkSpaceArray1[v]));
+                  }
+                }
+                if(targetAcquired[3][5] + 8 < 65){//////////Space enemy moved to +8 is < 65
+                  var frontSpace = "T" + String(targetAcquired[3][5] + 8);/////check spaces in front of it
+                  var checkSpaceArray2 = checkSides(frontSpace);
+                  checkSpaceArray2.push(frontSpace);
+                  console.log(checkSpaceArray1);
+                  console.log(checkSpaceArray2);
+                }
+
               }///////////////////////////////////////////////////////////
               else if(targetAcquired[3][11] < targetAcquired[3][12] && rowDiff >= latDiff){
                 //////////Target Behind enemy
@@ -669,11 +712,6 @@
               }///////////////////////////////////////////////////////////
 
             }////////End for all enemies on Field
-
-          ///Animation////
-          slash();
-          ///Animation///
-
 
             var initiate = setInterval(function(){
               phase = "Calculating"
